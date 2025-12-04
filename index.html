@@ -47,8 +47,6 @@
         .bg-light-navy { background-color: #eef2f6; border-color: #dbe4ee; }
         .banner-gradient { background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%); }
         body { background-color: #ffffff; }
-        .ai-thinking { background: linear-gradient(270deg, #eef2ff, #ffffff, #eef2ff); background-size: 400% 400%; animation: ai-gradient 2s ease infinite; }
-        @keyframes ai-gradient { 0% { background-position: 0% 50% } 50% { background-position: 100% 50% } 100% { background-position: 0% 50% } }
     </style>
 </head>
 <body class="text-black antialiased pb-24 bg-white">
@@ -132,8 +130,6 @@
 
                     <!-- 2. 資訊 -->
                     <div v-if="currentTab === 'info'" class="space-y-6 animate-fade-in">
-                        <section v-if="aiTravelTip" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl p-5 shadow-lg relative overflow-hidden"><div class="absolute right-0 top-0 opacity-20 text-6xl transform rotate-12 mr-[-10px] mt-[-10px]"><i class="fas fa-lightbulb"></i></div><h3 class="font-bold mb-2 flex items-center"><i class="fas fa-sparkles mr-2"></i> AI 福岡冬季小貼士</h3><p class="text-sm leading-relaxed opacity-95">{{ aiTravelTip }}</p></section>
-
                         <section class="bg-light-navy rounded-2xl p-5 shadow-sm border">
                             <h3 class="text-black font-bold mb-4 flex items-center justify-between"><span class="flex items-center"><i class="fas fa-coins mr-2 text-yellow-500"></i> 匯率換算</span><span class="text-[10px] bg-green-100 text-green-600 px-2 py-1 rounded-full">即時匯率</span></h3>
                             <div class="flex items-center space-x-2"><div class="flex-1"><label class="text-xs text-gray-500 block mb-1">日幣 (JPY)</label><input type="number" v-model="currency.jpy" @input="convertCurrency('jpy')" class="w-full bg-white rounded-lg p-2 font-mono text-lg text-black outline-none border"></div><i class="fas fa-exchange-alt text-gray-400 mt-5"></i><div class="flex-1"><label class="text-xs text-gray-500 block mb-1">港幣 (HKD)</label><input type="number" v-model="currency.hkd" @input="convertCurrency('hkd')" class="w-full bg-white rounded-lg p-2 font-mono text-lg text-black outline-none border"></div></div>
@@ -147,7 +143,7 @@
                                 <div class="flex justify-between text-xs font-bold text-gray-500 mb-3"><span class="bg-white/60 px-2 py-1 rounded">{{ flight.title }} {{ flight.date }}</span><span class="font-mono text-sm text-navy-800">{{ flight.code }}</span></div>
                                 <div class="flex justify-between items-center text-black px-2">
                                     <div><div class="text-3xl font-bold">{{ flight.depCode }}</div><div class="text-xs text-gray-600 font-bold mt-1">{{ flight.depTime }}</div></div>
-                                    <div class="text-xs text-gray-400 flex flex-col items-center"><span class="mb-1 text-[10px]">{{ flight.duration }}</span><div class="relative w-16 h-8 flex items-center justify-center"><i class="fas fa-plane text-2xl transition-transform" :style="{ display: 'inline-block', transform: flight.title === '去程' ? 'rotate(90deg)' : 'rotate(-90deg)' }" :class="flight.title === '去程' ? 'text-blue-400' : 'text-indigo-400'"></i></div></div>
+                                    <div class="text-xs text-gray-400 flex flex-col items-center"><span class="mb-1 text-[10px]">{{ flight.duration }}</span><div class="relative w-16 h-8 flex items-center justify-center"><i class="fas fa-plane text-2xl transition-transform" :style="{ display: 'inline-block', transform: flight.title === '去程' ? 'rotate(90deg)' : 'rotate(-90deg)', color: flight.title === '去程' ? '#60A5FA' : '#818CF8' }"></i></div></div>
                                     <div class="text-right"><div class="text-3xl font-bold">{{ flight.arrCode }}</div><div class="text-xs text-gray-600 font-bold mt-1">{{ flight.arrTime }}</div></div>
                                 </div>
                             </div>
@@ -171,7 +167,9 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div v-for="(item, index) in shoppingList" :key="index" class="glass rounded-2xl overflow-hidden shadow-sm relative group cursor-pointer" @click="openZoom(item.image)">
                                 <button @click.stop="triggerConfirm('確定移除此購物項目？', () => removeShoppingItem(index))" class="absolute top-2 right-2 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 hover:bg-black/70 z-10"><i class="fas fa-times"></i></button>
-                                <div class="h-32 bg-gray-200 bg-cover bg-center" :style="{ backgroundImage: `url(${item.image || 'https://via.placeholder.com/150?text=No+Image'})` }"></div>
+                                <div class="h-32 w-full bg-gray-200 overflow-hidden">
+                                    <img :src="item.image || 'https://via.placeholder.com/150?text=No+Image'" class="w-full h-full object-cover">
+                                </div>
                                 <div class="p-3"><h4 class="font-bold text-sm truncate text-black mb-1">{{ item.name }}</h4><div class="flex items-center justify-between mt-2"><div class="flex items-center"><input type="checkbox" v-model="item.checked" @click.stop class="w-4 h-4 rounded text-blue-500"><span class="text-xs text-gray-500 ml-1" :class="{'line-through': item.checked}">已買</span></div><div v-if="item.price" class="text-xs font-bold text-navy-800">¥ {{ Number(item.price).toLocaleString() }}</div></div></div>
                             </div>
                         </div>
@@ -198,16 +196,6 @@
 
                     <!-- 5. 日語 -->
                     <div v-if="currentTab === 'japanese'" class="animate-fade-in pb-10">
-                        <div :class="['glass rounded-2xl p-5 mb-6 border-2 border-indigo-100 transition-all', isAiLoading ? 'ai-thinking' : '']">
-                            <h3 class="font-bold mb-3 text-indigo-900 flex items-center"><i class="fas fa-robot mr-2 text-indigo-500"></i> AI 隨身翻譯</h3>
-                            <textarea v-model="aiInput" placeholder="請輸入情境，例如：「我想買感冒藥」..." class="w-full bg-white/50 p-3 rounded-xl text-sm mb-3 border border-indigo-100 outline-none resize-none h-20"></textarea>
-                            <button @click="askGemini" :disabled="isAiLoading || !aiInput" class="w-full bg-indigo-500 text-white py-3 rounded-xl font-bold shadow-md disabled:opacity-50"><span v-if="isAiLoading"><i class="fas fa-spinner fa-spin mr-2"></i> 翻譯中...</span><span v-else><i class="fas fa-magic mr-2"></i> AI 翻譯 / 生成對話</span></button>
-                            <div v-if="aiError" class="mt-3 text-xs text-red-500 font-bold text-center animate-fade-in"><i class="fas fa-exclamation-circle mr-1"></i> {{ aiError }}</div>
-                            <div v-if="aiResponse" class="mt-4 pt-4 border-t border-indigo-100 flex justify-between items-start">
-                                <div><p class="text-xl font-bold text-indigo-900 mb-1">{{ aiResponse.jp }}</p><p class="text-xs text-gray-400 italic mb-2">{{ aiResponse.romaji }}</p><p class="text-sm text-gray-700">{{ aiResponse.zh }}</p></div>
-                                <button @click="speak(aiResponse.jp)" class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center hover:bg-indigo-200 active:scale-90 transition-transform"><i class="fas fa-volume-up"></i></button>
-                            </div>
-                        </div>
                         <div class="flex overflow-x-auto space-x-2 mb-4 no-scrollbar"><button v-for="cat in japaneseCategories" @click="currentJpCat = cat" :class="['px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors border shadow-sm', currentJpCat === cat ? 'bg-navy-800 text-white border-transparent' : 'bg-white text-gray-500 border-gray-200']">{{ cat }}</button></div>
                         <div class="space-y-3">
                             <div v-for="(phrase, index) in filteredJapanese" :key="index" class="glass p-5 rounded-xl flex justify-between items-center hover:border-indigo-200 transition-colors">
@@ -230,39 +218,68 @@
             </div>
         </div>
         <div v-if="showImageZoom" class="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 cursor-pointer animate-fade-in" @click="showImageZoom = false"><img :src="zoomedImage" class="max-w-full max-h-full rounded-lg shadow-2xl transform transition-transform scale-100 hover:scale-105"><button class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300"><i class="fas fa-times"></i></button></div>
-        <div v-if="showAddModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center"><div class="bg-white w-full md:w-[500px] rounded-t-3xl p-6 shadow-2xl animate-slide-up max-h-[90vh] overflow-y-auto"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-black">{{ isEditing ? '編輯行程' : '新增行程' }}</h3><button @click="showAddModal = false" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div><div class="space-y-4"><div><label class="text-xs text-gray-500 mb-1 block">分類</label><select v-model="form.category" class="w-full bg-gray-50 p-3 rounded-xl outline-none text-black border border-gray-200"><option value="sightseeing">景點</option><option value="food">美食</option><option value="shopping">購物</option><option value="hotel">住宿</option><option value="flight">航班</option><option value="other">其他</option></select></div><div><label class="text-xs text-gray-500 mb-1 block">名稱</label><input v-model="form.name" class="w-full bg-gray-50 p-3 rounded-xl outline-none text-black border border-gray-200"></div><div><label class="text-xs text-gray-500 mb-1 block">開始時間</label><input type="time" v-model="form.startTime" class="w-full bg-gray-50 p-3 rounded-xl outline-none text-black border border-gray-200"></div><div v-if="form.category === 'flight'" class="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200"><input v-model="form.flightCode" placeholder="航班編號" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.duration" placeholder="飛行時間" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.depAirport" placeholder="起飛" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.depTime" type="time" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.arrAirport" placeholder="抵達" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.arrTime" type="time" class="p-2 rounded bg-white w-full border border-gray-200 text-black"></div><div v-else class="grid grid-cols-2 gap-3"><div><label class="text-xs text-gray-500 mb-1 block">營業時間</label><input v-model="form.openTime" class="w-full bg-gray-50 p-3 rounded-xl outline-none border border-gray-200"></div><div><label class="text-xs text-gray-500 mb-1 block">門票</label><input v-model="form.ticketPrice" class="w-full bg-gray-50 p-3 rounded-xl outline-none border border-gray-200"></div></div><div><label class="text-xs text-gray-500 mb-1 block">交通</label><div class="flex space-x-2"><button v-for="m in ['walk','train','car']" @click="form.transportMode = m" :class="['flex-1 py-2 rounded-lg text-sm border', form.transportMode === m ? 'bg-navy-800 text-white' : 'bg-gray-50']"><i :class="getTransportIcon(m)"></i></button></div></div><div><label class="text-xs text-gray-500 mb-1 block">備註</label><textarea v-model="form.note" class="w-full bg-gray-50 p-3 rounded-xl outline-none border border-gray-200 h-20"></textarea></div><div class="flex space-x-3 pt-4"><button v-if="isEditing" @click="triggerConfirm('刪除此行程？', confirmDeleteItineraryItem)" class="flex-1 bg-red-50 text-red-500 py-3 rounded-xl font-bold border border-red-100 hover:bg-red-100">刪除</button><button @click="saveItinerary" class="flex-[2] bg-navy-900 text-white py-3 rounded-xl font-bold shadow-lg">儲存</button></div></div></div></div>
-        <div v-if="showShoppingModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center"><div class="bg-white w-full md:w-[400px] rounded-t-3xl p-6 shadow-2xl animate-slide-up"><h3 class="text-xl font-bold mb-4 text-black">新增購物清單</h3><input v-model="shoppingForm.name" placeholder="商品名稱" class="w-full bg-gray-50 p-3 rounded-xl mb-3 outline-none border border-gray-200"><input type="number" v-model="shoppingForm.price" placeholder="預算 (日幣)" class="w-full bg-gray-50 p-3 rounded-xl mb-3 outline-none border border-gray-200"><label class="block w-full h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer mb-4 hover:bg-gray-50"><span v-if="!shoppingForm.preview" class="text-gray-400 text-sm"><i class="fas fa-camera mb-2"></i> 上傳圖片</span><img v-else :src="shoppingForm.preview" class="h-full w-full object-cover rounded-xl"><input type="file" accept="image/*" class="hidden" @change="handleImageUpload"></label><button @click="saveShopping" class="w-full bg-pink-500 text-white py-3 rounded-xl font-bold shadow-md">加入清單</button><button @click="showShoppingModal = false" class="w-full text-gray-500 py-2 mt-2 text-sm text-center block">取消</button></div></div>
-        <div v-if="showExpenseModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center"><div class="bg-white w-full md:w-[400px] rounded-t-3xl p-6 shadow-2xl animate-slide-up"><h3 class="text-xl font-bold mb-4 text-black">記帳</h3><div class="grid grid-cols-3 gap-2 mb-4"><button v-for="cat in ['交通','飲食','住宿','門票','購物','其他']" @click="expenseForm.category = cat" :class="['text-xs py-2 rounded-lg border', expenseForm.category === cat ? 'bg-navy-900 text-white' : 'text-gray-600']">{{ cat }}</button></div><input v-model="expenseForm.name" placeholder="項目名稱" class="w-full bg-gray-50 p-3 rounded-xl mb-3 outline-none border border-gray-200"><input type="number" v-model="expenseForm.amount" placeholder="金額 (日幣)" class="w-full bg-gray-50 p-3 rounded-xl mb-3 outline-none border border-gray-200"><div class="flex space-x-2 mb-4"><button @click="expenseForm.method = '現金'" :class="['flex-1 py-2 rounded-lg text-sm border', expenseForm.method === '現金' ? 'bg-green-500 text-white' : 'bg-gray-50']">現金</button><button @click="expenseForm.method = '信用卡'" :class="['flex-1 py-2 rounded-lg text-sm border', expenseForm.method === '信用卡' ? 'bg-blue-500 text-white' : 'bg-gray-50']">信用卡</button></div><button @click="saveExpense" class="w-full bg-navy-900 text-white py-3 rounded-xl font-bold shadow-md">儲存</button><button @click="showExpenseModal = false" class="w-full text-gray-500 py-2 mt-2 text-sm text-center block">取消</button></div></div>
+        <div v-if="showAddModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center"><div class="bg-white w-full md:w-[500px] rounded-t-3xl p-6 shadow-2xl animate-slide-up max-h-[90vh] overflow-y-auto"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-black">{{ isEditing ? '編輯行程' : '新增行程' }}</h3><button @click="showAddModal = false" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div><div class="space-y-4"><div><label class="text-xs text-gray-500 mb-1 block">分類</label><select v-model="form.category" class="w-full bg-gray-50 p-3 rounded-xl outline-none text-black border border-gray-200"><option value="sightseeing">景點</option><option value="food">美食</option><option value="shopping">購物</option><option value="hotel">住宿</option><option value="flight">航班</option><option value="other">其他</option></select></div><div><label class="text-xs text-gray-500 mb-1 block">名稱</label><input v-model="form.name" class="w-full bg-gray-50 p-3 rounded-xl outline-none text-black border border-gray-200"></div><div><label class="text-xs text-gray-500 mb-1 block">開始時間</label><input type="time" v-model="form.startTime" class="w-full bg-gray-50 p-3 rounded-xl outline-none text-black border border-gray-200"></div><div v-if="form.category === 'flight'" class="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200"><input v-model="form.flightCode" placeholder="航班編號" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.duration" placeholder="飛行時間" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.depAirport" placeholder="起飛" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.depTime" type="time" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.arrAirport" placeholder="抵達" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.arrTime" type="time" class="p-2 rounded bg-white w-full border border-gray-200 text-black"></div><div v-else class="grid grid-cols-2 gap-3"><div><label class="text-xs text-gray-500 mb-1 block">營業時間</label><input v-model="form.openTime" class="w-full bg-gray-50 p-3 rounded-xl outline-none border border-gray-200"></div><div><label class="text-xs text-gray-500 mb-1 block">門票</label><input v-model="form.ticketPrice" class="w-full bg-gray-50 p-3 rounded-xl outline-none border border-gray-200"></div></div><div><label class="text-xs text-gray-500 mb-1 block">交通</label><div class="flex space-x-2"><button v-for="m in ['walk','train','car']" @click="form.transportMode = m" :class="['flex-1 py-2 rounded-lg text-sm border', form.transportMode === m ? 'bg-navy-800 text-white' : 'bg-gray-50']"><i :class="getTransportIcon(m)"></i></button></div></div><div><label class="text-xs text-gray-500 mb-1 block">備註</label><textarea v-model="form.note" class="w-full bg-gray-50 p-3 rounded-xl outline-none border border-gray-200 h-20"></textarea></div><div class="flex space-x-3 pt-4"><button v-if="isEditing" @click="triggerConfirm('刪除此行程？', confirmDeleteItineraryItem)" class="flex-1 bg-red-50 text-red-500 py-3 rounded-xl font-bold border border-red-100">刪除</button><button @click="saveItinerary" class="flex-[2] bg-navy-900 text-white py-3 rounded-xl font-bold shadow-lg">儲存</button></div></div></div></div>
+        
+        <!-- Shopping Modal -->
+        <div v-if="showShoppingModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center">
+            <div class="bg-white w-full md:w-[400px] rounded-t-3xl p-6 shadow-2xl animate-slide-up">
+                <h3 class="text-xl font-bold mb-4">新增購物清單</h3>
+                <input v-model="shoppingForm.name" placeholder="商品名稱" class="w-full bg-gray-50 p-3 rounded-xl mb-3 outline-none border border-gray-200">
+                <input type="number" v-model="shoppingForm.price" placeholder="預算/金額 (日幣)" class="w-full bg-gray-50 p-3 rounded-xl mb-3 outline-none border border-gray-200">
+                <label class="block w-full h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer mb-4 hover:bg-gray-50"><span v-if="!shoppingForm.preview" class="text-gray-400 text-sm"><i class="fas fa-camera mb-2"></i> 上傳圖片</span><img v-else :src="shoppingForm.preview" class="h-full w-full object-cover rounded-xl"><input type="file" accept="image/*" class="hidden" @change="handleImageUpload"></label>
+                <button @click="saveShopping" class="w-full bg-pink-500 text-white py-3 rounded-xl font-bold shadow-md">加入清單</button>
+                <button @click="showShoppingModal = false" class="w-full text-gray-500 py-2 mt-2 text-sm text-center block">取消</button>
+            </div>
+        </div>
+
+        <!-- Expense Modal -->
+        <div v-if="showExpenseModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center">
+            <div class="bg-white w-full md:w-[400px] rounded-t-3xl p-6 shadow-2xl animate-slide-up">
+                <h3 class="text-xl font-bold mb-4">記帳</h3>
+                <div class="grid grid-cols-3 gap-2 mb-4"><button v-for="cat in ['交通','飲食','住宿','門票','購物','其他']" @click="expenseForm.category = cat" :class="['text-xs py-2 rounded-lg border', expenseForm.category === cat ? 'bg-navy-900 text-white' : 'text-gray-600']">{{ cat }}</button></div>
+                <input v-model="expenseForm.name" placeholder="項目名稱" class="w-full bg-gray-50 p-3 rounded-xl mb-3 outline-none border border-gray-200">
+                <input type="number" v-model="expenseForm.amount" placeholder="金額 (日幣)" class="w-full bg-gray-50 p-3 rounded-xl mb-3 outline-none border border-gray-200">
+                <div class="flex space-x-2 mb-4"><button @click="expenseForm.method = '現金'" :class="['flex-1 py-2 rounded-lg text-sm border', expenseForm.method === '現金' ? 'bg-green-500 text-white' : 'bg-gray-50']">現金</button><button @click="expenseForm.method = '信用卡'" :class="['flex-1 py-2 rounded-lg text-sm border', expenseForm.method === '信用卡' ? 'bg-blue-500 text-white' : 'bg-gray-50']">信用卡</button></div>
+                <button @click="saveExpense" class="w-full bg-navy-900 text-white py-3 rounded-xl font-bold shadow-md">儲存</button>
+                <button @click="showExpenseModal = false" class="w-full text-gray-500 py-2 mt-2 text-sm text-center block">取消</button>
+            </div>
+        </div>
+
+        <!-- Info Modal -->
         <div v-if="showInfoModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center"><div class="bg-white w-full md:w-[500px] rounded-t-3xl p-6 shadow-2xl animate-slide-up"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-black">{{ infoMode === 'add' ? '新增' : '編輯' }}資訊</h3><button @click="showInfoModal = false" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div><div class="space-y-4"><div v-if="infoType === 'flight'" class="space-y-3"><div class="flex space-x-3"><input v-model="infoForm.title" placeholder="標題" class="flex-1 p-3 rounded-xl bg-gray-50 border outline-none"><input v-model="infoForm.date" type="date" class="flex-1 p-3 rounded-xl bg-gray-50 border outline-none"></div><input v-model="infoForm.code" placeholder="航班" class="w-full p-3 rounded-xl bg-gray-50 border outline-none"><div class="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-xl border"><input v-model="infoForm.depCode" placeholder="起飛" class="p-2 rounded border w-full"><input v-model="infoForm.depTime" type="time" class="p-2 rounded border w-full"><input v-model="infoForm.arrCode" placeholder="抵達" class="p-2 rounded border w-full"><input v-model="infoForm.arrTime" type="time" class="p-2 rounded border w-full"></div><input v-model="infoForm.duration" placeholder="時長" class="w-full p-3 rounded-xl bg-gray-50 border outline-none"></div><div v-if="infoType === 'hotel'" class="space-y-3"><input v-model="infoForm.name" placeholder="飯店" class="w-full p-3 rounded-xl bg-gray-50 border outline-none"><input v-model="infoForm.address" placeholder="地址" class="w-full p-3 rounded-xl bg-gray-50 border outline-none"><input v-model="infoForm.phone" placeholder="電話" class="w-full p-3 rounded-xl bg-gray-50 border outline-none"></div><button @click="saveInfoData" class="w-full bg-navy-900 text-white py-3 rounded-xl font-bold mt-4 shadow-md">儲存</button></div></div></div>
 
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { createApp, ref, computed, watch, onMounted, nextTick } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
 
         // ==========================================================================================
-        // [請在此處貼上您的 FIREBASE 設定]
-        // 1. 前往 Firebase Console -> Project Settings -> General -> Your apps -> Config
-        // 2. 複製 const firebaseConfig = { ... }; 的內容並貼在下方取代目前的範例
+        // [GitHub 部署設定]
+        // 當您要上傳到 GitHub 時，請將您的 Firebase 設定填入下方的 `userFirebaseConfig` 物件中。
         // ==========================================================================================
-        const firebaseConfig = {
+        const userFirebaseConfig = {
             apiKey: "AIzaSyArAk6Y3h38j8YzagbyOTWwtpN1Mh5xNiw",
             authDomain: "travel-box-62d35.firebaseapp.com",
-            databaseURL: "https://travel-box-62d35-default-rtdb.firebaseio.com",
             projectId: "travel-box-62d35",
             storageBucket: "travel-box-62d35.firebasestorage.app",
             messagingSenderId: "133527202914",
-            appId: "1:133527202914:web:d13cd249fead572ec7b53b",
-            measurementId: "G-6SHR3JVL1M"
+            appId: "1:133527202914:web:d13cd249fead572ec7b53b"
         };
+        
+        let firebaseConfig;
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+            } else {
+                firebaseConfig = userFirebaseConfig;
+            }
+        } catch (e) {
+            firebaseConfig = userFirebaseConfig;
+        }
 
-        // [請填入您的 GEMINI API KEY] (若留空則無法使用 AI 翻譯)
-        const geminiApiKey = "YOUR_GEMINI_API_KEY";
-
-        // 這是您行程的唯一 ID，您可以隨意更改以建立新的空白行程表
         const APP_ID = 'my-2026-fukuoka-trip';
         // ==========================================================================================
 
@@ -270,6 +287,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        // Safe app ID handling for preview vs prod
+        const currentAppId = (typeof __app_id !== 'undefined') ? __app_id : APP_ID;
 
         createApp({
             setup() {
@@ -284,9 +303,6 @@
                 const expenseChartCanvas = ref(null);
                 let expenseChart = null;
                 const confirmState = ref({ show: false, msg: '', action: null });
-                
-                // AI State
-                const aiInput = ref(""), aiResponse = ref(null), isAiLoading = ref(false), aiError = ref(""), aiTravelTip = ref("");
                 
                 // Data
                 const tripDates = ref([
@@ -337,9 +353,29 @@
                 const getExpenseColor = (c) => ({'交通':'bg-blue-400','飲食':'bg-orange-400','住宿':'bg-indigo-400','門票':'bg-green-400','購物':'bg-pink-400','其他':'bg-gray-400'}[c]);
 
                 // --- Core Logic ---
-                const addDay = () => { /* Implement add day logic here if needed to extend trip dates */ };
-                const deleteDay = (idx) => { /* Implement delete day logic here */ };
-                
+                const addDay = () => {
+                    const lastDay = tripDates.value[tripDates.value.length - 1];
+                    const nextDate = new Date(lastDay.fullDate);
+                    nextDate.setDate(nextDate.getDate() + 1);
+                    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    tripDates.value.push({
+                        fullDate: nextDate.toISOString().split('T')[0],
+                        week: days[nextDate.getDay()],
+                        date: nextDate.getDate().toString()
+                    });
+                    itineraryData.value[tripDates.value[tripDates.value.length - 1].fullDate] = [];
+                    selectedDateIndex.value = tripDates.value.length - 1;
+                    saveData();
+                };
+
+                const deleteDay = (index) => {
+                    if (tripDates.value.length <= 1) return;
+                    if (index === selectedDateIndex.value) selectedDateIndex.value = 0;
+                    else if (index < selectedDateIndex.value) selectedDateIndex.value--;
+                    tripDates.value.splice(index, 1);
+                    saveData();
+                };
+
                 const dragStart = (idx) => { event.dataTransfer.effectAllowed = 'move'; event.dataTransfer.setData('text/plain', idx); };
                 const drop = (toIdx) => {
                     const fromIdx = event.dataTransfer.getData('text/plain');
@@ -381,11 +417,55 @@
                 const updateExchangeRate = async () => { try { const res = await fetch('https://open.er-api.com/v6/latest/HKD'); const data = await res.json(); if(data?.rates?.JPY) currency.value.rate = (1/data.rates.JPY).toFixed(4); } catch(e){} };
                 const convertCurrency = (t) => { if(t==='jpy') currency.value.hkd=(currency.value.jpy*currency.value.rate).toFixed(2); else currency.value.jpy=(currency.value.hkd/currency.value.rate).toFixed(0); };
                 
-                const handleImageUpload = (e) => { const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=(ev)=>shoppingForm.value.preview=ev.target.result; r.readAsDataURL(f); };
+                // Image compression logic
+                const handleImageUpload = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            
+                            // Max dimensions to limit size
+                            const maxWidth = 800;
+                            const maxHeight = 800;
+                            let width = img.width;
+                            let height = img.height;
+
+                            if (width > height) {
+                                if (width > maxWidth) {
+                                    height *= maxWidth / width;
+                                    width = maxWidth;
+                                }
+                            } else {
+                                if (height > maxHeight) {
+                                    width *= maxHeight / height;
+                                    height = maxHeight;
+                                }
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            // Compress to JPEG 0.7 quality
+                            shoppingForm.value.preview = canvas.toDataURL('image/jpeg', 0.7);
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                };
+
                 const saveShopping = () => { if(!shoppingForm.value.name)return; shoppingList.value.push({...shoppingForm.value, id:Date.now(), checked:false}); shoppingForm.value={name:'',price:'',preview:null}; showShoppingModal.value=false; saveData(); };
                 const removeShoppingItem = (i) => { shoppingList.value.splice(i,1); saveData(); };
-                const openZoom = (img) => { if(img) { zoomedImage.value=img; showImageZoom.value=true; } };
-
+                const openZoom = (img) => { 
+                    zoomedImage.value = img || 'https://via.placeholder.com/150?text=No+Image'; 
+                    showImageZoom.value = true; 
+                };
+                
                 const updateChart = () => {
                     if(!expenseChartCanvas.value) return;
                     const cats = ['交通','飲食','住宿','門票','購物','其他'];
@@ -399,9 +479,7 @@
 
                 const fetchWeather = async () => {
                    const lat = 33.5904; const lon = 130.4017; const dateStr = currentKey.value;
-                   // Simplified fetch logic for brevity, full logic in previous versions is implied
                    try {
-                       // Use current weather for demo
                        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Asia%2FTokyo`);
                        const data = await res.json();
                        if(data.current_weather) weather.value = { temp: Math.round(data.current_weather.temperature), feelsLike: Math.round(data.current_weather.temperature), status: '即時', icon: 'fas fa-sun', isForecast: false };
@@ -409,34 +487,42 @@
                 };
                 watch(selectedDateIndex, fetchWeather);
 
-                const askGemini = async () => {
-                    if(!geminiApiKey || !aiInput.value) { aiError.value = "請先設定 API Key"; return; }
-                    isAiLoading.value=true; aiError.value='';
-                    try {
-                        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({contents:[{parts:[{text:`Translate to polite Japanese: "${aiInput.value}". Output JSON {jp, romaji, zh}`}]}]}) });
-                        const data = await res.json();
-                        if(data.error) throw new Error(data.error.message);
-                        aiResponse.value = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim());
-                    } catch(e) { aiError.value = "AI 發生錯誤"; } finally { isAiLoading.value=false; }
-                };
-
-                // Firebase Core
+                // Firebase Core - Use JSON stringify to avoid nested array issues
                 const saveData = () => {
-                    const data = { tripDates: tripDates.value, itinerary: itineraryData.value, shopping: shoppingList.value, expenses: expenses.value, flights: flights.value, hotels: hotels.value };
-                    setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'travel', 'main'), data).catch(e => console.error("Save Error", e));
+                    const data = {
+                        tripDates: JSON.stringify(tripDates.value),
+                        itinerary: JSON.stringify(itineraryData.value),
+                        shopping: JSON.stringify(shoppingList.value),
+                        expenses: JSON.stringify(expenses.value),
+                        flights: JSON.stringify(flights.value),
+                        hotels: JSON.stringify(hotels.value)
+                    };
+                    setDoc(doc(db, 'artifacts', currentAppId, 'public', 'data', 'travel', 'main'), data)
+                        .catch(err => {
+                            console.error("Save Error", err);
+                            if (err.code === 'invalid-argument' && err.message.includes('1048487 bytes')) {
+                                alert("儲存失敗：資料量過大（可能是圖片太多）。請嘗試刪除部分圖片後再試。");
+                            }
+                        });
                 };
 
                 onMounted(() => {
-                    signInAnonymously(auth).then(() => {
-                        onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'travel', 'main'), (snap) => {
+                    // Use custom token if available (Preview env), else anonymous (GitHub)
+                    const authPromise = (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) 
+                        ? signInWithCustomToken(auth, __initial_auth_token) 
+                        : signInAnonymously(auth);
+
+                    authPromise.then(() => {
+                        onSnapshot(doc(db, 'artifacts', currentAppId, 'public', 'data', 'travel', 'main'), (snap) => {
                             if(snap.exists()) {
                                 const d = snap.data();
-                                tripDates.value = d.tripDates || tripDates.value;
-                                Object.assign(itineraryData.value, d.itinerary);
-                                shoppingList.value = d.shopping || [];
-                                expenses.value = d.expenses || [];
-                                flights.value = d.flights || [];
-                                hotels.value = d.hotels || [];
+                                // Parse JSON strings back to objects
+                                if (d.tripDates) tripDates.value = JSON.parse(d.tripDates);
+                                if (d.itinerary) Object.assign(itineraryData.value, JSON.parse(d.itinerary));
+                                if (d.shopping) shoppingList.value = JSON.parse(d.shopping);
+                                if (d.expenses) expenses.value = JSON.parse(d.expenses);
+                                if (d.flights) flights.value = JSON.parse(d.flights);
+                                if (d.hotels) hotels.value = JSON.parse(d.hotels);
                             } else { saveData(); } // Init DB if empty
                             loading.value = false;
                         });
@@ -445,7 +531,7 @@
                     fetchWeather();
                 });
 
-                return { currentTab, tabs, tripDates, selectedDateIndex, weather, currency, currentDayItinerary, showAddModal, isEditing, form, saveItinerary, editItem, confirmDeleteItineraryItem, resetForm, dragStart, drop, addDay, deleteDay, openMap, calculateTravelTime, moveItem, shoppingList, showShoppingModal, shoppingForm, handleImageUpload, saveShopping, removeShoppingItem, expenses, showExpenseModal, expenseForm, saveExpense, removeExpense, totalExpenses, japaneseCategories, currentJpCat, filteredJapanese, speak, callNumber, convertCurrency, flights, hotels, showInfoModal, infoMode, infoType, infoForm, openInfoModal, saveInfoData, deleteInfoData, confirmState, triggerConfirm, executeConfirm, loading, aiInput, aiResponse, isAiLoading, askGemini, aiTravelTip, aiError, zoomedImage, showImageZoom, openZoom, expenseChartCanvas, getCategoryName, getCategoryColor, getCategoryIcon, getTransportIcon, getExpenseIcon, getExpenseColor };
+                return { currentTab, tabs, tripDates, selectedDateIndex, weather, currency, currentDayItinerary, showAddModal, isEditing, form, saveItinerary, editItem, confirmDeleteItineraryItem, resetForm, dragStart, drop, addDay, deleteDay, openMap, calculateTravelTime, moveItem, shoppingList, showShoppingModal, shoppingForm, handleImageUpload, saveShopping, removeShoppingItem, expenses, showExpenseModal, expenseForm, saveExpense, removeExpense, totalExpenses, japaneseCategories, currentJpCat, filteredJapanese, speak, callNumber, convertCurrency, flights, hotels, showInfoModal, infoMode, infoType, infoForm, openInfoModal, saveInfoData, deleteInfoData, confirmState, triggerConfirm, executeConfirm, loading, zoomedImage, showImageZoom, openZoom, expenseChartCanvas, getCategoryName, getCategoryColor, getCategoryIcon, getTransportIcon, getExpenseIcon, getExpenseColor };
             }
         }).mount('#app');
     </script>
