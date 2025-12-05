@@ -10,7 +10,7 @@
     <link rel="icon" href="icon.jpg">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="2026 福岡之旅">
+    <meta name="apple-mobile-web-app-title" content="2026 福岡">
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -485,6 +485,15 @@
                 const getTransportIcon = (m) => m==='walk'?'fas fa-walking':m==='car'?'fas fa-car':'fas fa-subway';
                 const getExpenseIcon = (c) => ({'交通':'fas fa-train','飲食':'fas fa-utensils','住宿':'fas fa-bed','門票':'fas fa-ticket-alt','購物':'fas fa-shopping-bag','其他':'fas fa-circle'}[c]);
                 const getExpenseColor = (c) => ({'交通':'bg-blue-400','飲食':'bg-orange-400','住宿':'bg-indigo-400','門票':'bg-green-400','購物':'bg-pink-400','其他':'bg-gray-400'}[c]);
+
+                // 監聽 Modal 狀態以鎖定背景滾動
+                watch(
+                    [showAddModal, showShoppingModal, showExpenseModal, showInfoModal, showImageZoom, () => confirmState.value.show],
+                    (values) => {
+                        const isModalOpen = values.some(v => v);
+                        document.body.style.overflow = isModalOpen ? 'hidden' : '';
+                    }
+                );
 
                 // Logic
                 const addDay = () => {
