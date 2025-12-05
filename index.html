@@ -7,7 +7,7 @@
     
     <!-- iOS Home Screen Icon & Web App Settings -->
     <!-- 建議使用 PNG 格式以獲得最佳相容性 -->
-    <link rel="apple-touch-icon" href="icon.jpg">
+    <link rel="apple-touch-icon" href="icon.webp">
     <link rel="icon" href="icon.webp">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -66,8 +66,7 @@
         
         <!-- Banner -->
         <header class="relative w-full h-[280px] md:h-[350px] flex items-center justify-center overflow-hidden shadow-lg bg-navy-900">
-            <!-- 使用 Unsplash 圖片作為預覽佔位符，實際部署時請換回 'banner.webp' -->
-            <div class="absolute top-0 left-0 w-full h-full bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1559336197-ded8aaa244bc?q=80&w=2800&auto=format&fit=crop');"></div>
+            <div class="absolute top-0 left-0 w-full h-full bg-[url('banner.webp')] bg-cover bg-center"></div>
             <div class="absolute top-0 left-0 w-full h-full banner-gradient"></div>
             
             <div class="relative z-10 text-center text-white px-4 -mt-24">
@@ -141,7 +140,7 @@
                         <button @click="showAddModal = true; isEditing = false; resetForm()" class="fixed bottom-6 right-6 w-14 h-14 bg-navy-900 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
                     </div>
 
-                    <!-- 2. 行李 (Packing List) - NEW -->
+                    <!-- 2. 行李 (Packing List) -->
                     <div v-if="currentTab === 'packing'" class="animate-fade-in">
                         <!-- Progress Bar -->
                         <div class="mb-6 bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
@@ -168,7 +167,7 @@
                             </div>
 
                             <div v-for="item in filteredPackingList" :key="item.id" @click="togglePackingItem(item)" class="glass p-4 rounded-xl flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform">
-                                <div class="flex items-center">
+                                <div class="flex items-center flex-1">
                                     <div :class="['w-6 h-6 rounded border flex items-center justify-center mr-3 transition-colors', item.checked ? 'bg-green-500 border-green-500' : 'border-gray-300 bg-white']">
                                         <i v-if="item.checked" class="fas fa-check text-white text-xs"></i>
                                     </div>
@@ -177,7 +176,14 @@
                                         <span class="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{{ item.category }}</span>
                                     </div>
                                 </div>
-                                <button @click.stop="triggerConfirm('移除此物品？', () => removePackingItem(item))" class="w-8 h-8 rounded-full text-gray-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center"><i class="fas fa-trash text-xs"></i></button>
+                                <div class="flex items-center">
+                                    <!-- Gender Icon -->
+                                    <div v-if="item.gender" class="mr-6 opacity-80">
+                                        <i v-if="item.gender === 'male'" class="fas fa-mars text-blue-500 text-lg"></i>
+                                        <i v-if="item.gender === 'female'" class="fas fa-venus text-pink-500 text-lg"></i>
+                                    </div>
+                                    <button @click.stop="triggerConfirm('移除此物品？', () => removePackingItem(item))" class="w-8 h-8 rounded-full text-gray-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center"><i class="fas fa-trash text-xs"></i></button>
+                                </div>
                             </div>
                         </div>
                         
@@ -360,6 +366,15 @@
                 <div class="grid grid-cols-3 gap-2 mb-4">
                     <button v-for="cat in packingCategories" :key="cat" @click="packingForm.category = cat" :class="['text-xs py-2 rounded-lg border', packingForm.category === cat ? 'bg-navy-900 text-white' : 'text-gray-600']">{{ cat }}</button>
                 </div>
+                <!-- Gender Selection -->
+                <div class="flex space-x-3 mb-4">
+                    <button @click="packingForm.gender = 'male'" :class="['flex-1 py-2 rounded-lg border flex items-center justify-center text-sm font-bold', packingForm.gender === 'male' ? 'bg-blue-100 border-blue-500 text-blue-600' : 'border-gray-200 text-gray-400']">
+                        <i class="fas fa-mars mr-2"></i> 男生
+                    </button>
+                    <button @click="packingForm.gender = 'female'" :class="['flex-1 py-2 rounded-lg border flex items-center justify-center text-sm font-bold', packingForm.gender === 'female' ? 'bg-pink-100 border-pink-500 text-pink-600' : 'border-gray-200 text-gray-400']">
+                        <i class="fas fa-venus mr-2"></i> 女生
+                    </button>
+                </div>
                 <button @click="savePackingItem" class="w-full bg-ice-500 text-white py-3 rounded-xl font-bold shadow-md">加入清單</button>
                 <button @click="showPackingModal = false" class="w-full text-gray-500 py-2 mt-2 text-sm text-center block">取消</button>
             </div>
@@ -479,7 +494,7 @@
                 // Forms
                 const infoForm = ref({});
                 const shoppingForm = ref({ name: '', price: '', preview: null });
-                const packingForm = ref({ name: '', category: '證件錢包' }); // New Form
+                const packingForm = ref({ name: '', category: '證件錢包', gender: null }); // New: gender field
                 const expenseForm = ref({ id: null, category: '飲食', name: '', amount: '', method: '現金', date: '' });
                 const form = ref({ id: null, category: 'sightseeing', startTime: '', name: '', openTime: '', ticketPrice: '', note: '', transportMode: 'train' });
 
@@ -685,9 +700,9 @@
                 // --- Packing Logic (New) ---
                 const savePackingItem = () => {
                     if(!packingForm.value.name) return;
-                    const newItem = { name: packingForm.value.name, category: packingForm.value.category, checked: false, createdAt: Date.now() };
+                    const newItem = { name: packingForm.value.name, category: packingForm.value.category, gender: packingForm.value.gender, checked: false, createdAt: Date.now() };
                     addDoc(collection(db, 'artifacts', currentAppId, 'public', 'data', 'travel_packing'), newItem);
-                    packingForm.value.name = ''; 
+                    packingForm.value.name = ''; packingForm.value.gender = null; // Reset form
                     showPackingModal.value = false;
                 };
                 const removePackingItem = (item) => { deleteDoc(doc(db, 'artifacts', currentAppId, 'public', 'data', 'travel_packing', item.id)); };
