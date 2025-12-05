@@ -6,7 +6,6 @@
     <title>2026 福岡之旅 | OurLoveStory</title>
     
     <!-- iOS Home Screen Icon & Web App Settings -->
-    <!-- 建議使用 PNG 格式以獲得最佳相容性 -->
     <link rel="apple-touch-icon" href="icon.webp">
     <link rel="icon" href="icon.webp">
     <link rel="manifest" href="manifest.json">
@@ -55,7 +54,6 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .glass { background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: #000; }
         .banner-gradient { background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%); }
-        /* 隱藏地圖連結的底線 */
         a { text-decoration: none; }
         body { background-color: #ffffff; -webkit-tap-highlight-color: transparent; }
     </style>
@@ -66,7 +64,7 @@
         
         <!-- Banner -->
         <header class="relative w-full h-[280px] md:h-[350px] flex items-center justify-center overflow-hidden shadow-lg bg-navy-900">
-            <div class="absolute top-0 left-0 w-full h-full bg-[url('banner.webp')] bg-cover bg-center"></div>
+            <div class="absolute top-0 left-0 w-full h-full bg-cover bg-center" style="background-image: url('banner.webp');"></div>
             <div class="absolute top-0 left-0 w-full h-full banner-gradient"></div>
             
             <div class="relative z-10 text-center text-white px-4 -mt-24">
@@ -74,7 +72,7 @@
             </div>
 
             <!-- Tabs -->
-            <div class="absolute bottom-12 right-4 z-50 flex space-x-3 overflow-x-auto p-2 no-scrollbar w-full justify-end pr-4">
+            <div class="absolute bottom-12 left-0 z-50 flex w-full space-x-3 overflow-x-auto p-2 px-4 no-scrollbar justify-start md:justify-center">
                 <button v-for="tab in tabs" :key="tab.id" @click="currentTab = tab.id" 
                     :class="['flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300 shadow-lg backdrop-blur-md border border-white/20 flex-shrink-0', currentTab === tab.id ? 'bg-ice-500 text-white scale-110 shadow-ice-500/50' : 'bg-white/20 text-white hover:bg-white/30']">
                     <i :class="tab.icon + ' text-xl mb-1'"></i>
@@ -137,7 +135,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button @click="showAddModal = true; isEditing = false; resetForm()" class="fixed bottom-6 right-6 w-14 h-14 bg-navy-900 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
+                        <button @click="scrollToMenu(); showAddModal = true; isEditing = false; resetForm()" class="fixed bottom-6 right-6 w-14 h-14 bg-navy-900 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
                     </div>
 
                     <!-- 2. 行李 (Packing List) -->
@@ -187,7 +185,7 @@
                             </div>
                         </div>
                         
-                        <button @click="showPackingModal = true" class="fixed bottom-6 right-6 w-14 h-14 bg-ice-500 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
+                        <button @click="scrollToMenu(); showPackingModal = true" class="fixed bottom-6 right-6 w-14 h-14 bg-ice-500 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
                     </div>
 
                     <!-- 3. 資訊 -->
@@ -199,7 +197,7 @@
                         </section>
                         
                         <section class="space-y-4">
-                             <div class="flex items-center justify-between px-1"><h3 class="text-black font-bold flex items-center"><i class="fas fa-plane-departure mr-2 text-blue-500"></i> 航班資訊</h3><button @click="openInfoModal('flight', 'add')" class="text-xs bg-blue-100 text-blue-600 px-3 py-1.5 rounded-full hover:bg-blue-200 font-bold"><i class="fas fa-plus mr-1"></i> 新增</button></div>
+                             <div class="flex items-center justify-between px-1"><h3 class="text-black font-bold flex items-center"><i class="fas fa-plane-departure mr-2 text-blue-500"></i> 航班資訊</h3><button @click="scrollToMenu(); openInfoModal('flight', 'add')" class="text-xs bg-blue-100 text-blue-600 px-3 py-1.5 rounded-full hover:bg-blue-200 font-bold"><i class="fas fa-plus mr-1"></i> 新增</button></div>
                             <div v-for="(flight, index) in flights" :key="flight.id" :class="['rounded-xl p-5 pb-16 relative group border shadow-sm', flight.title === '去程' ? 'bg-blue-50 border-blue-100' : 'bg-indigo-50 border-indigo-100']">
                                  <div class="absolute bottom-1 right-3 flex space-x-2"><button @click="openInfoModal('flight', 'edit', flight)" class="w-8 h-8 rounded-full bg-white/80 text-gray-500 hover:text-blue-500 flex items-center justify-center shadow-sm"><i class="fas fa-pen text-xs"></i></button><button @click="triggerConfirm('確定刪除此航班？', () => deleteInfoData('flight', flight.id))" class="w-8 h-8 rounded-full bg-white/80 text-gray-500 hover:text-red-500 flex items-center justify-center shadow-sm"><i class="fas fa-trash text-xs"></i></button></div>
                                 <div class="flex justify-between text-xs font-bold text-gray-500 mb-3"><span class="bg-white/60 px-2 py-1 rounded">{{ flight.title }} {{ flight.date }}</span><span class="font-mono text-sm text-navy-800">{{ flight.code }}</span></div>
@@ -227,7 +225,7 @@
                         </section>
 
                         <section class="space-y-4">
-                            <div class="flex items-center justify-between px-1"><h3 class="text-black font-bold flex items-center"><i class="fas fa-bed mr-2 text-indigo-500"></i> 住宿資訊</h3><button @click="openInfoModal('hotel', 'add')" class="text-xs bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-full hover:bg-indigo-200 font-bold"><i class="fas fa-plus mr-1"></i> 新增</button></div>
+                            <div class="flex items-center justify-between px-1"><h3 class="text-black font-bold flex items-center"><i class="fas fa-bed mr-2 text-indigo-500"></i> 住宿資訊</h3><button @click="scrollToMenu(); openInfoModal('hotel', 'add')" class="text-xs bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-full hover:bg-indigo-200 font-bold"><i class="fas fa-plus mr-1"></i> 新增</button></div>
                             <div v-for="(h, index) in hotels" :key="h.id" class="glass rounded-xl p-5 border-l-4 border-l-indigo-500 border-t border-r border-b border-gray-200 relative">
                                 <div class="absolute bottom-3 right-3 flex space-x-2"><button @click="openInfoModal('hotel', 'edit', h)" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:text-blue-500 flex items-center justify-center"><i class="fas fa-pen text-xs"></i></button><button @click="triggerConfirm('確定刪除此住宿？', () => deleteInfoData('hotel', h.id))" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:text-red-500 flex items-center justify-center"><i class="fas fa-trash text-xs"></i></button></div>
                                 <h4 class="font-bold text-lg text-black pr-16">{{ h.name }}</h4>
@@ -291,7 +289,7 @@
                             <i class="fas fa-shopping-basket text-4xl mb-3 opacity-50"></i>
                             <p>點擊右下角 + 新增購物清單</p>
                         </div>
-                        <button @click="showShoppingModal = true" class="fixed bottom-6 right-6 w-14 h-14 bg-pink-500 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
+                        <button @click="scrollToMenu(); showShoppingModal = true" class="fixed bottom-6 right-6 w-14 h-14 bg-pink-500 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
                     </div>
 
                     <!-- 5. 開支 -->
@@ -314,7 +312,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button @click="openExpenseModal('add')" class="fixed bottom-6 right-6 w-14 h-14 bg-yellow-500 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
+                        <button @click="scrollToMenu(); openExpenseModal('add')" class="fixed bottom-6 right-6 w-14 h-14 bg-yellow-500 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
                     </div>
 
                     <!-- 6. 日語 -->
@@ -480,6 +478,12 @@
                 const zoomedImage = ref(null), showImageZoom = ref(false);
                 const confirmState = ref({ show: false, msg: '', action: null });
                 
+                // Helper to scroll to menu position
+                const scrollToMenu = () => {
+                    // Scroll to 150px down from top (hides part of banner, shows tabs at top)
+                    window.scrollTo({ top: 150, behavior: 'smooth' });
+                };
+
                 // Data
                 const tripDates = ref([
                     { fullDate: '2026-01-02', week: 'Fri', date: '2' }, { fullDate: '2026-01-03', week: 'Sat', date: '3' },
@@ -809,7 +813,8 @@
                     japaneseCategories, currentJpCat, filteredJapanese, speak, callNumber, convertCurrency, 
                     flights, hotels, showInfoModal, infoMode, infoType, infoForm, openInfoModal, saveInfoData, deleteInfoData, 
                     confirmState, triggerConfirm, executeConfirm, loading, cacheLoaded, zoomedImage, showImageZoom, openZoom, 
-                    getCategoryName, getCategoryColor, getCategoryIcon, getTransportIcon, getExpenseIcon, getExpenseColor 
+                    getCategoryName, getCategoryColor, getCategoryIcon, getTransportIcon, getExpenseIcon, getExpenseColor,
+                    scrollToMenu,
                 };
             }
         }).mount('#app');
