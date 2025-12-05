@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2026 福岡之旅 | SnowTravel</title>
+    <title>2026 福岡之旅 | OurLoveStory</title>
+    
+    <!-- iOS Home Screen Icon & Web App Settings -->
+    <link rel="apple-touch-icon" href="icon.jpg">
+    <link rel="icon" href="icon.jpg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="2026 福岡之旅">
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -18,7 +25,7 @@
                     fontFamily: { sans: ['Noto Sans TC', 'sans-serif'] },
                     colors: {
                         navy: { 50: '#f0f4f8', 100: '#d9e2ec', 500: '#334e68', 800: '#102a43', 900: '#0b1d30' },
-                        ice: { 100: '#e3f8ff', 500: '#40c3f7' }
+                        ice: { 100: '#e3f8ff', 200: '#bdebf9', 500: '#40c3f7' }
                     },
                     animation: {
                         'pop-in': 'pop-in 0.2s ease-out forwards',
@@ -33,10 +40,9 @@
         }
     </script>
 
-    <!-- FontAwesome & Chart.js -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    
     <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
@@ -88,7 +94,7 @@
                         <div class="flex space-x-4 overflow-x-auto no-scrollbar mb-6 pb-2 items-center pt-2">
                             <div v-for="(day, index) in tripDates" :key="index" @click="selectedDateIndex = index"
                                 :class="['relative flex-shrink-0 flex flex-col items-center justify-center w-16 h-20 rounded-2xl cursor-pointer transition-all border group shadow-sm', selectedDateIndex === index ? 'bg-navy-800 text-white border-transparent transform scale-105' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400']">
-                                <button @click.stop="triggerConfirm('確定刪除此日？', () => deleteDay(index))" v-if="tripDates.length > 1" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md z-10"><i class="fas fa-times text-[10px]"></i></button>
+                                <button @click.stop="triggerConfirm('確定刪除此日？', () => deleteDay(index))" v-if="tripDates.length > 1 && index === tripDates.length - 1" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md z-10"><i class="fas fa-times text-[10px]"></i></button>
                                 <span class="text-xs font-medium uppercase">{{ day.week }}</span>
                                 <span class="text-2xl font-bold">{{ day.date }}</span>
                             </div>
@@ -110,7 +116,8 @@
                             <div v-for="(item, index) in currentDayItinerary" :key="item.id" class="relative z-10 group" draggable="true" @dragstart="dragStart(index)" @dragover.prevent @drop="drop(index)">
                                 <div v-if="index > 0" class="flex items-center ml-14 mb-2"><div class="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full border border-gray-200 flex items-center"><i :class="getTransportIcon(item.transportMode) + ' mr-2'"></i><span>約 {{ calculateTravelTime(currentDayItinerary[index-1], item) }}</span></div></div>
                                 <div v-if="index === 0 && item.category !== 'flight'" class="flex items-center ml-14 mb-2"><div class="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full border border-gray-200 flex items-center"><i class="fas fa-hotel mr-2"></i><span>飯店出發</span><i class="fas fa-walking mx-2"></i><span>約 20 分</span></div></div>
-                                <div class="flex bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative overflow-visible" @click="openMap(item.name)">
+                                
+                                <div class="flex bg-white rounded-2xl p-4 shadow-[0_4px_20px_-4px_rgba(64,195,247,0.25)] border border-ice-100 relative overflow-visible transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_8px_25px_-4px_rgba(64,195,247,0.35)]">
                                     <div class="flex flex-col items-center mr-4 min-w-[3.5rem] z-10"><div :class="['w-14 h-14 rounded-full flex items-center justify-center text-white text-xl mb-2 shadow-md', getCategoryColor(item.category)]"><i :class="getCategoryIcon(item.category)"></i></div><div class="text-sm font-bold text-gray-800 font-mono">{{ item.startTime || '--:--' }}</div></div>
                                     <div class="flex-1 min-w-0 pt-1">
                                         <h3 class="text-lg font-bold text-gray-900 mb-1 leading-tight">{{ item.name }}</h3>
@@ -130,8 +137,7 @@
 
                     <!-- 2. 資訊 -->
                     <div v-if="currentTab === 'info'" class="space-y-6 animate-fade-in">
-                        <!-- 匯率換算 (修正參數邏輯) -->
-                        <section class="bg-light-navy rounded-2xl p-5 shadow-sm border">
+                        <section class="bg-gradient-to-br from-[#f0f4f8] to-[#d9e2ec] rounded-2xl p-5 shadow-sm border border-navy-100">
                             <h3 class="text-black font-bold mb-4 flex items-center justify-between"><span class="flex items-center"><i class="fas fa-coins mr-2 text-yellow-500"></i> 匯率換算</span><span class="text-[10px] bg-green-100 text-green-600 px-2 py-1 rounded-full">即時匯率</span></h3>
                             <div class="flex items-center space-x-2"><div class="flex-1"><label class="text-xs text-gray-500 block mb-1">日幣 (JPY)</label><input type="number" v-model="currency.jpy" @input="convertCurrency('jpy')" class="w-full bg-white rounded-lg p-2 font-mono text-lg text-black outline-none border"></div><i class="fas fa-exchange-alt text-gray-400 mt-5"></i><div class="flex-1"><label class="text-xs text-gray-500 block mb-1">港幣 (HKD)</label><input type="number" v-model="currency.hkd" @input="convertCurrency('hkd')" class="w-full bg-white rounded-lg p-2 font-mono text-lg text-black outline-none border"></div></div>
                             <p class="text-[10px] text-right text-gray-400 mt-2">1 JPY ≈ {{ currency.rate }} HKD</p>
@@ -143,9 +149,24 @@
                                  <div class="absolute bottom-1 right-3 flex space-x-2"><button @click="openInfoModal('flight', 'edit', flight)" class="w-8 h-8 rounded-full bg-white/80 text-gray-500 hover:text-blue-500 flex items-center justify-center shadow-sm"><i class="fas fa-pen text-xs"></i></button><button @click="triggerConfirm('確定刪除此航班？', () => deleteInfoData('flight', flight.id))" class="w-8 h-8 rounded-full bg-white/80 text-gray-500 hover:text-red-500 flex items-center justify-center shadow-sm"><i class="fas fa-trash text-xs"></i></button></div>
                                 <div class="flex justify-between text-xs font-bold text-gray-500 mb-3"><span class="bg-white/60 px-2 py-1 rounded">{{ flight.title }} {{ flight.date }}</span><span class="font-mono text-sm text-navy-800">{{ flight.code }}</span></div>
                                 <div class="flex justify-between items-center text-black px-2">
-                                    <div><div class="text-3xl font-bold">{{ flight.depCode }}</div><div class="text-xs text-gray-600 font-bold mt-1">{{ flight.depTime }}</div></div>
-                                    <div class="text-xs text-gray-400 flex flex-col items-center"><span class="mb-1 text-[10px]">{{ flight.duration }}</span><div class="relative w-16 h-8 flex items-center justify-center"><i class="fas fa-plane text-2xl transition-transform" :style="{ display: 'inline-block', transform: flight.title === '去程' ? 'rotate(90deg)' : 'rotate(-90deg)', color: flight.title === '去程' ? '#60A5FA' : '#818CF8' }"></i></div></div>
-                                    <div class="text-right"><div class="text-3xl font-bold">{{ flight.arrCode }}</div><div class="text-xs text-gray-600 font-bold mt-1">{{ flight.arrTime }}</div></div>
+                                    <div>
+                                        <div class="text-3xl font-bold">{{ flight.depCode }}</div>
+                                        <div class="text-xs text-gray-600 font-bold mt-1">{{ flight.depTime }}</div>
+                                        <div class="text-[10px] text-gray-400 font-normal mt-0.5">(當地時間)</div>
+                                    </div>
+                                    <div class="text-xs text-gray-400 flex flex-col items-center">
+                                        <span class="mb-1 text-[10px]">{{ flight.duration }}</span>
+                                        <div class="relative w-16 h-8 flex items-center justify-center">
+                                            <i :class="flight.title === '去程' ? 'fas fa-plane-departure' : 'fas fa-plane-arrival'" 
+                                               class="text-2xl" 
+                                               :style="{ color: flight.title === '去程' ? '#60A5FA' : '#818CF8' }"></i>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-3xl font-bold">{{ flight.arrCode }}</div>
+                                        <div class="text-xs text-gray-600 font-bold mt-1">{{ flight.arrTime }}</div>
+                                        <div class="text-[10px] text-gray-400 font-normal mt-0.5">(當地時間)</div>
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -163,41 +184,88 @@
                         <section class="grid grid-cols-2 gap-4"><div class="bg-red-50 p-4 rounded-2xl text-center cursor-pointer border border-red-100 hover:bg-red-100" @click="callNumber('110')"><i class="fas fa-user-shield text-3xl text-red-500 mb-2"></i><div class="font-bold text-red-600">警察 110</div></div><div class="bg-red-50 p-4 rounded-2xl text-center cursor-pointer border border-red-100 hover:bg-red-100" @click="callNumber('119')"><i class="fas fa-ambulance text-3xl text-red-500 mb-2"></i><div class="font-bold text-red-600">救護 119</div></div></section>
                     </div>
 
-                    <!-- 3. 購物 (圖片修復 & 點擊放大) -->
+                    <!-- 3. 購物 (修復邏輯) -->
                     <div v-if="currentTab === 'shopping'" class="animate-fade-in">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div v-for="(item, index) in shoppingList" :key="index" class="glass rounded-2xl overflow-hidden shadow-sm relative group cursor-pointer" @click="openZoom(item.image)">
-                                <button @click.stop="triggerConfirm('確定移除此購物項目？', () => removeShoppingItem(index))" class="absolute top-2 right-2 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 hover:bg-black/70 z-10"><i class="fas fa-times"></i></button>
-                                <div class="h-32 w-full bg-gray-200 overflow-hidden flex items-center justify-center relative">
-                                    <img v-if="item.image" :src="item.image" class="w-full h-full object-cover absolute inset-0">
-                                    <div v-else class="text-gray-400 text-xs flex flex-col items-center"><i class="fas fa-image text-2xl mb-1"></i>No Image</div>
+                        <!-- 待買區 -->
+                        <div v-if="pendingShoppingList.length > 0" class="mb-8">
+                            <h3 class="text-navy-900 font-bold mb-3 flex items-center text-lg"><i class="fas fa-hourglass-half mr-2 text-orange-400"></i> 等待購買 ({{ pendingShoppingList.length }})</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div v-for="(item) in pendingShoppingList" :key="item.id" class="glass rounded-2xl overflow-hidden shadow-sm relative group cursor-pointer" @click="openZoom(item.image)">
+                                    <button @click.stop="triggerConfirm('確定移除此購物項目？', () => removeShoppingItem(item))" class="absolute top-2 right-2 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-black/70 z-10"><i class="fas fa-times"></i></button>
+                                    <div class="h-32 w-full bg-gray-200 overflow-hidden flex items-center justify-center relative">
+                                        <img v-if="item.image" :src="item.image" class="w-full h-full object-cover absolute inset-0">
+                                        <div v-else class="text-gray-400 text-xs flex flex-col items-center"><i class="fas fa-image text-2xl mb-1"></i>No Image</div>
+                                    </div>
+                                    <div class="p-3">
+                                        <h4 class="font-bold text-sm truncate text-black mb-1">{{ item.name }}</h4>
+                                        <div class="flex items-center justify-between mt-2">
+                                            <div class="flex items-center" @click.stop>
+                                                <input type="checkbox" :checked="item.checked" @change="toggleShoppingItem(item)" class="w-4 h-4 rounded text-blue-500 focus:ring-blue-500 border-gray-300 cursor-pointer">
+                                                <span class="text-xs text-gray-500 ml-1">未買</span>
+                                            </div>
+                                            <div v-if="item.price" class="text-xs font-bold text-navy-800">¥ {{ Number(item.price).toLocaleString() }}</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="p-3"><h4 class="font-bold text-sm truncate text-black mb-1">{{ item.name }}</h4><div class="flex items-center justify-between mt-2"><div class="flex items-center"><input type="checkbox" v-model="item.checked" @click.stop class="w-4 h-4 rounded text-blue-500"><span class="text-xs text-gray-500 ml-1" :class="{'line-through': item.checked}">已買</span></div><div v-if="item.price" class="text-xs font-bold text-navy-800">¥ {{ Number(item.price).toLocaleString() }}</div></div></div>
                             </div>
+                        </div>
+
+                        <!-- 已買區 -->
+                        <div v-if="purchasedShoppingList.length > 0" class="mb-8 opacity-70">
+                            <h3 class="text-navy-900 font-bold mb-3 flex items-center text-lg"><i class="fas fa-check-circle mr-2 text-green-500"></i> 已購買 ({{ purchasedShoppingList.length }})</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div v-for="(item) in purchasedShoppingList" :key="item.id" class="glass rounded-2xl overflow-hidden shadow-sm relative group cursor-pointer grayscale" @click="openZoom(item.image)">
+                                    <button @click.stop="triggerConfirm('確定移除此購物項目？', () => removeShoppingItem(item))" class="absolute top-2 right-2 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-black/70 z-10"><i class="fas fa-times"></i></button>
+                                    <div class="h-32 w-full bg-gray-200 overflow-hidden flex items-center justify-center relative">
+                                        <img v-if="item.image" :src="item.image" class="w-full h-full object-cover absolute inset-0">
+                                        <div v-else class="text-gray-400 text-xs flex flex-col items-center"><i class="fas fa-image text-2xl mb-1"></i>No Image</div>
+                                    </div>
+                                    <div class="p-3">
+                                        <h4 class="font-bold text-sm truncate text-black mb-1 line-through text-gray-400">{{ item.name }}</h4>
+                                        <div class="flex items-center justify-between mt-2">
+                                            <div class="flex items-center" @click.stop>
+                                                <input type="checkbox" :checked="item.checked" @change="toggleShoppingItem(item)" class="w-4 h-4 rounded text-blue-500 focus:ring-blue-500 border-gray-300 cursor-pointer">
+                                                <span class="text-xs text-gray-500 ml-1">已買</span>
+                                            </div>
+                                            <div v-if="item.price" class="text-xs font-bold text-navy-800 line-through text-gray-400">¥ {{ Number(item.price).toLocaleString() }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="shoppingList.length === 0" class="text-center py-20 text-gray-400">
+                            <i class="fas fa-shopping-basket text-4xl mb-3 opacity-50"></i>
+                            <p>點擊右下角 + 新增購物清單</p>
                         </div>
                         <button @click="showShoppingModal = true" class="fixed bottom-6 right-6 w-14 h-14 bg-pink-500 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
                     </div>
 
-                    <!-- 4. 開支 (圓餅圖) -->
+                    <!-- 4. 開支 -->
                     <div v-if="currentTab === 'expenses'" class="animate-fade-in">
                         <div class="bg-navy-900 text-white rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden">
                             <div class="absolute -right-6 -top-6 w-32 h-32 bg-ice-500 rounded-full opacity-20 blur-2xl"></div>
                             <p class="text-sm opacity-70 mb-1">總支出 (日幣)</p>
                             <h2 class="text-4xl font-bold">¥ {{ totalExpenses.toLocaleString() }}</h2>
                             <p class="text-xs opacity-50 mt-2">約 HKD {{ (totalExpenses * currency.rate).toFixed(1) }}</p>
-                            <!-- Pie Chart -->
-                            <div class="mt-4 bg-white/10 rounded-xl p-2 flex justify-center" v-show="expenses.length > 0"><div class="w-48 h-48"><canvas ref="expenseChartCanvas"></canvas></div></div>
                         </div>
                         <div class="space-y-3">
                             <div v-for="(exp) in expenses" :key="exp.id" class="glass p-4 rounded-xl flex items-center justify-between">
                                 <div class="flex items-center"><div :class="['w-10 h-10 rounded-full flex items-center justify-center text-white mr-3', getExpenseColor(exp.category)]"><i :class="getExpenseIcon(exp.category)"></i></div><div><h4 class="font-bold text-sm text-black">{{ exp.name }}</h4><p class="text-xs text-gray-500">{{ exp.date }} · {{ exp.method }}</p></div></div>
-                                <div class="text-right"><div class="font-bold text-black">¥ {{ Number(exp.amount).toLocaleString() }}</div><button @click="triggerConfirm('確定刪除此筆開支紀錄？', () => removeExpense(exp.id))" class="text-[10px] text-red-400 mt-1 hover:text-red-600">刪除</button></div>
+                                <div class="text-right flex flex-col items-end">
+                                    <div class="font-bold text-black">¥ {{ Number(exp.amount).toLocaleString() }}</div>
+                                    <!-- 新增編輯/刪除按鈕區 -->
+                                    <div class="flex space-x-2 mt-1">
+                                        <button @click="openExpenseModal('edit', exp)" class="text-[10px] text-blue-400 hover:text-blue-600"><i class="fas fa-pen mr-1"></i>編輯</button>
+                                        <button @click="triggerConfirm('確定刪除此筆開支紀錄？', () => removeExpense(exp.id))" class="text-[10px] text-red-400 hover:text-red-600"><i class="fas fa-trash mr-1"></i>刪除</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <button @click="showExpenseModal = true" class="fixed bottom-6 right-6 w-14 h-14 bg-yellow-500 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
+                        <button @click="openExpenseModal('add')" class="fixed bottom-6 right-6 w-14 h-14 bg-yellow-500 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
                     </div>
 
-                    <!-- 5. 日語 (Expanded 10 phrases per category) -->
+                    <!-- 5. 日語 -->
                     <div v-if="currentTab === 'japanese'" class="animate-fade-in pb-10">
                         <div class="flex overflow-x-auto space-x-2 mb-4 no-scrollbar"><button v-for="cat in japaneseCategories" @click="currentJpCat = cat" :class="['px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors border shadow-sm', currentJpCat === cat ? 'bg-navy-800 text-white border-transparent' : 'bg-white text-gray-500 border-gray-200']">{{ cat }}</button></div>
                         <div class="space-y-3">
@@ -220,15 +288,10 @@
                  <div class="flex space-x-3"><button @click="confirmState.show = false" class="flex-1 py-3 rounded-2xl bg-gray-100 font-bold text-gray-600 hover:bg-gray-200">取消</button><button @click="executeConfirm" class="flex-1 py-3 rounded-2xl bg-red-500 text-white font-bold shadow-lg shadow-red-500/30 hover:bg-red-600">刪除</button></div>
             </div>
         </div>
-        <!-- Image Zoom (Lightbox) -->
-        <div v-if="showImageZoom" class="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 cursor-pointer animate-fade-in" @click="showImageZoom = false">
-            <img v-if="zoomedImage" :src="zoomedImage" class="max-w-full max-h-full rounded-lg shadow-2xl transform transition-transform scale-100 hover:scale-105">
-            <div v-else class="text-white text-xl">沒有圖片</div>
-            <button class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300"><i class="fas fa-times"></i></button>
-        </div>
-        
+        <div v-if="showImageZoom" class="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 cursor-pointer animate-fade-in" @click="showImageZoom = false"><img :src="zoomedImage" class="max-w-full max-h-full rounded-lg shadow-2xl transform transition-transform scale-100 hover:scale-105"><button class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300"><i class="fas fa-times"></i></button></div>
         <div v-if="showAddModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center"><div class="bg-white w-full md:w-[500px] rounded-t-3xl p-6 shadow-2xl animate-slide-up max-h-[90vh] overflow-y-auto"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-black">{{ isEditing ? '編輯行程' : '新增行程' }}</h3><button @click="showAddModal = false" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div><div class="space-y-4"><div><label class="text-xs text-gray-500 mb-1 block">分類</label><select v-model="form.category" class="w-full bg-gray-50 p-3 rounded-xl outline-none text-black border border-gray-200"><option value="sightseeing">景點</option><option value="food">美食</option><option value="shopping">購物</option><option value="hotel">住宿</option><option value="flight">航班</option><option value="other">其他</option></select></div><div><label class="text-xs text-gray-500 mb-1 block">名稱</label><input v-model="form.name" class="w-full bg-gray-50 p-3 rounded-xl outline-none text-black border border-gray-200"></div><div><label class="text-xs text-gray-500 mb-1 block">開始時間</label><input type="time" v-model="form.startTime" class="w-full bg-gray-50 p-3 rounded-xl outline-none text-black border border-gray-200"></div><div v-if="form.category === 'flight'" class="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200"><input v-model="form.flightCode" placeholder="航班編號" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.duration" placeholder="飛行時間" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.depAirport" placeholder="起飛" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.depTime" type="time" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.arrAirport" placeholder="抵達" class="p-2 rounded bg-white w-full border border-gray-200 text-black"><input v-model="form.arrTime" type="time" class="p-2 rounded bg-white w-full border border-gray-200 text-black"></div><div v-else class="grid grid-cols-2 gap-3"><div><label class="text-xs text-gray-500 mb-1 block">營業時間</label><input v-model="form.openTime" class="w-full bg-gray-50 p-3 rounded-xl outline-none border border-gray-200"></div><div><label class="text-xs text-gray-500 mb-1 block">門票</label><input v-model="form.ticketPrice" class="w-full bg-gray-50 p-3 rounded-xl outline-none border border-gray-200"></div></div><div><label class="text-xs text-gray-500 mb-1 block">交通</label><div class="flex space-x-2"><button v-for="m in ['walk','train','car']" @click="form.transportMode = m" :class="['flex-1 py-2 rounded-lg text-sm border', form.transportMode === m ? 'bg-navy-800 text-white' : 'bg-gray-50']"><i :class="getTransportIcon(m)"></i></button></div></div><div><label class="text-xs text-gray-500 mb-1 block">備註</label><textarea v-model="form.note" class="w-full bg-gray-50 p-3 rounded-xl outline-none border border-gray-200 h-20"></textarea></div><div class="flex space-x-3 pt-4"><button v-if="isEditing" @click="triggerConfirm('刪除此行程？', confirmDeleteItineraryItem)" class="flex-1 bg-red-50 text-red-500 py-3 rounded-xl font-bold border border-red-100">刪除</button><button @click="saveItinerary" class="flex-[2] bg-navy-900 text-white py-3 rounded-xl font-bold shadow-lg">儲存</button></div></div></div></div>
         
+        <!-- Shopping Modal -->
         <div v-if="showShoppingModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center">
             <div class="bg-white w-full md:w-[400px] rounded-t-3xl p-6 shadow-2xl animate-slide-up">
                 <h3 class="text-xl font-bold mb-4">新增購物清單</h3>
@@ -240,9 +303,10 @@
             </div>
         </div>
 
+        <!-- Expense Modal -->
         <div v-if="showExpenseModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center">
             <div class="bg-white w-full md:w-[400px] rounded-t-3xl p-6 shadow-2xl animate-slide-up">
-                <h3 class="text-xl font-bold mb-4">記帳</h3>
+                <h3 class="text-xl font-bold mb-4">{{ expenseForm.id ? '編輯記帳' : '新增記帳' }}</h3>
                 <div class="grid grid-cols-3 gap-2 mb-4"><button v-for="cat in ['交通','飲食','住宿','門票','購物','其他']" @click="expenseForm.category = cat" :class="['text-xs py-2 rounded-lg border', expenseForm.category === cat ? 'bg-navy-900 text-white' : 'text-gray-600']">{{ cat }}</button></div>
                 <input v-model="expenseForm.name" placeholder="項目名稱" class="w-full bg-gray-50 p-3 rounded-xl mb-3 outline-none border border-gray-200">
                 <input type="number" v-model="expenseForm.amount" placeholder="金額 (日幣)" class="w-full bg-gray-50 p-3 rounded-xl mb-3 outline-none border border-gray-200">
@@ -252,14 +316,45 @@
             </div>
         </div>
 
-        <div v-if="showInfoModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center"><div class="bg-white w-full md:w-[500px] rounded-t-3xl p-6 shadow-2xl animate-slide-up"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-black">{{ infoMode === 'add' ? '新增' : '編輯' }}資訊</h3><button @click="showInfoModal = false" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div><div class="space-y-4"><div v-if="infoType === 'flight'" class="space-y-3"><div class="flex space-x-3"><input v-model="infoForm.title" placeholder="標題" class="flex-1 p-3 rounded-xl bg-gray-50 border outline-none"><input v-model="infoForm.date" type="date" class="flex-1 p-3 rounded-xl bg-gray-50 border outline-none"></div><input v-model="infoForm.code" placeholder="航班" class="w-full p-3 rounded-xl bg-gray-50 border outline-none"><div class="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-xl border"><input v-model="infoForm.depCode" placeholder="起飛" class="p-2 rounded border w-full"><input v-model="infoForm.depTime" type="time" class="p-2 rounded border w-full"><input v-model="infoForm.arrCode" placeholder="抵達" class="p-2 rounded border w-full"><input v-model="infoForm.arrTime" type="time" class="p-2 rounded border w-full"></div><input v-model="infoForm.duration" placeholder="時長" class="w-full p-3 rounded-xl bg-gray-50 border outline-none"></div><div v-if="infoType === 'hotel'" class="space-y-3"><input v-model="infoForm.name" placeholder="飯店" class="w-full p-3 rounded-xl bg-gray-50 border outline-none"><input v-model="infoForm.address" placeholder="地址" class="w-full p-3 rounded-xl bg-gray-50 border outline-none"><input v-model="infoForm.phone" placeholder="電話" class="w-full p-3 rounded-xl bg-gray-50 border outline-none"></div><button @click="saveInfoData" class="w-full bg-navy-900 text-white py-3 rounded-xl font-bold mt-4 shadow-md">儲存</button></div></div></div>
+        <!-- Info Modal -->
+        <div v-if="showInfoModal" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center">
+            <div class="bg-white w-full md:w-[500px] rounded-t-3xl p-6 shadow-2xl animate-slide-up">
+                <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold text-black">{{ infoMode === 'add' ? '新增' : '編輯' }}資訊</h3><button @click="showInfoModal = false" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div>
+                <div class="space-y-4">
+                    <div v-if="infoType === 'flight'" class="space-y-3">
+                        <div class="flex space-x-2">
+                             <button @click="infoForm.title = '去程'" :class="['flex-1 py-3 rounded-xl font-bold border transition-colors', infoForm.title === '去程' ? 'bg-blue-500 text-white border-blue-600' : 'bg-gray-50 text-gray-400 border-gray-200']"><i class="fas fa-plane-departure mr-2"></i>去程</button>
+                             <button @click="infoForm.title = '回程'" :class="['flex-1 py-3 rounded-xl font-bold border transition-colors', infoForm.title === '回程' ? 'bg-indigo-500 text-white border-indigo-600' : 'bg-gray-50 text-gray-400 border-gray-200']"><i class="fas fa-plane-arrival mr-2"></i>回程</button>
+                        </div>
+                        <input v-model="infoForm.date" type="date" class="w-full p-3 rounded-xl bg-gray-50 border outline-none text-black">
+                        
+                        <input v-model="infoForm.code" placeholder="航班" class="w-full p-3 rounded-xl bg-gray-50 border outline-none">
+                        <div class="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-xl border">
+                            <input v-model="infoForm.depCode" placeholder="起飛" class="p-2 rounded border w-full">
+                            <input v-model="infoForm.depTime" type="time" class="p-2 rounded border w-full">
+                            <input v-model="infoForm.arrCode" placeholder="抵達" class="p-2 rounded border w-full">
+                            <input v-model="infoForm.arrTime" type="time" class="p-2 rounded border w-full">
+                        </div>
+                        <input v-model="infoForm.duration" placeholder="時長" class="w-full p-3 rounded-xl bg-gray-50 border outline-none">
+                    </div>
+                    
+                    <div v-if="infoType === 'hotel'" class="space-y-3">
+                        <input v-model="infoForm.name" placeholder="飯店" class="w-full p-3 rounded-xl bg-gray-50 border outline-none">
+                        <input v-model="infoForm.address" placeholder="地址" class="w-full p-3 rounded-xl bg-gray-50 border outline-none">
+                        <input v-model="infoForm.phone" placeholder="電話" class="w-full p-3 rounded-xl bg-gray-50 border outline-none">
+                    </div>
+                    
+                    <button @click="saveInfoData" class="w-full bg-navy-900 text-white py-3 rounded-xl font-bold mt-4 shadow-md">儲存</button>
+                </div>
+            </div>
+        </div>
 
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { createApp, ref, computed, watch, onMounted, nextTick } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
 
         // ==========================================================================================
@@ -267,7 +362,7 @@
         // ==========================================================================================
         const userFirebaseConfig = {
             apiKey: "AIzaSyArAk6Y3h38j8YzagbyOTWwtpN1Mh5xNiw",
-                authDomain: "travel-box-62d35.firebaseapp.com",
+            authDomain: "travel-box-62d35.firebaseapp.com",
             projectId: "travel-box-62d35",
             storageBucket: "travel-box-62d35.firebasestorage.app",
             messagingSenderId: "133527202914",
@@ -288,7 +383,6 @@
         const APP_ID = 'my-2026-fukuoka-trip';
         // ==========================================================================================
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -296,7 +390,7 @@
 
         createApp({
             setup() {
-                // State
+                // --- State Variables ---
                 const currentTab = ref('itinerary');
                 const selectedDateIndex = ref(0);
                 const showAddModal = ref(false), showShoppingModal = ref(false), showExpenseModal = ref(false), showInfoModal = ref(false);
@@ -325,7 +419,7 @@
                 const expenseForm = ref({ id: null, category: '飲食', name: '', amount: '', method: '現金', date: '' });
                 const form = ref({ id: null, category: 'sightseeing', startTime: '', name: '', openTime: '', ticketPrice: '', note: '', transportMode: 'train' });
 
-                // Expanded Japanese Data (10 per category)
+                // Expanded Japanese Data
                 const japaneseData = [
                     // Basic
                     { cat: '基本應對', jp: 'こんにちは', romaji: 'Konnichiwa', zh: '你好' }, { cat: '基本應對', jp: 'ありがとうございます', romaji: 'Arigatou', zh: '謝謝' },
@@ -367,13 +461,17 @@
                 const currentDayItinerary = computed(() => itineraryData.value[currentKey.value] || []);
                 const totalExpenses = computed(() => expenses.value.reduce((sum, item) => sum + Number(item.amount), 0));
                 const filteredJapanese = computed(() => japaneseData.filter(i => i.cat === currentJpCat.value));
+                
+                // Computed for Shopping List
+                const pendingShoppingList = computed(() => shoppingList.value.filter(item => !item.checked).reverse()); // Newest on top
+                const purchasedShoppingList = computed(() => shoppingList.value.filter(item => item.checked).reverse());
 
                 // Helpers
                 const triggerConfirm = (msg, action) => { confirmState.value = { show: true, msg, action }; };
                 const executeConfirm = () => { 
                     if(confirmState.value.action) confirmState.value.action(); 
                     confirmState.value.show = false; 
-                    // Close parent modals if any
+                    // Force close parent modals if open
                     if(showAddModal.value) showAddModal.value = false;
                 };
                 const openMap = (k) => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(k)}`, '_blank');
@@ -389,20 +487,75 @@
                 const getExpenseColor = (c) => ({'交通':'bg-blue-400','飲食':'bg-orange-400','住宿':'bg-indigo-400','門票':'bg-green-400','購物':'bg-pink-400','其他':'bg-gray-400'}[c]);
 
                 // Logic
-                const addDay = () => { /* Same add day logic */ };
-                const deleteDay = (idx) => { if(tripDates.value.length>1){ if(idx===selectedDateIndex.value)selectedDateIndex.value=0; else if(idx<selectedDateIndex.value)selectedDateIndex.value--; tripDates.value.splice(idx,1); saveData(); }};
+                const addDay = () => {
+                    const lastDay = tripDates.value[tripDates.value.length - 1];
+                    const nextDate = new Date(lastDay.fullDate);
+                    nextDate.setDate(nextDate.getDate() + 1);
+                    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    tripDates.value.push({
+                        fullDate: nextDate.toISOString().split('T')[0],
+                        week: days[nextDate.getDay()],
+                        date: nextDate.getDate().toString()
+                    });
+                    itineraryData.value[tripDates.value[tripDates.value.length - 1].fullDate] = [];
+                    selectedDateIndex.value = tripDates.value.length - 1;
+                    saveData();
+                };
+
+                const deleteDay = (index) => {
+                    if (tripDates.value.length <= 1) return;
+                    if (index === selectedDateIndex.value) selectedDateIndex.value = 0;
+                    else if (index < selectedDateIndex.value) selectedDateIndex.value--;
+                    tripDates.value.splice(index, 1);
+                    saveData();
+                };
+
                 const dragStart = (idx) => { event.dataTransfer.effectAllowed = 'move'; event.dataTransfer.setData('text/plain', idx); };
-                const drop = (toIdx) => { const fromIdx = event.dataTransfer.getData('text/plain'); if(fromIdx!=='') { const list = itineraryData.value[currentKey.value]; const [m] = list.splice(fromIdx, 1); list.splice(toIdx, 0, m); saveData(); }};
-                const moveItem = (idx, dir) => { const list = itineraryData.value[currentKey.value]; const n = idx+dir; if(n>=0 && n<list.length){ [list[idx],list[n]]=[list[n],list[idx]]; saveData(); }};
+                const drop = (toIdx) => {
+                    const fromIdx = event.dataTransfer.getData('text/plain');
+                    if(fromIdx === '') return;
+                    const list = itineraryData.value[currentKey.value];
+                    const [moved] = list.splice(fromIdx, 1);
+                    list.splice(toIdx, 0, moved);
+                    saveData();
+                };
+                const moveItem = (idx, dir) => {
+                    const list = itineraryData.value[currentKey.value];
+                    const newIdx = idx + dir;
+                    if(newIdx >= 0 && newIdx < list.length) {
+                        [list[idx], list[newIdx]] = [list[newIdx], list[idx]];
+                        saveData();
+                    }
+                };
 
                 const resetForm = () => { form.value = { id: null, category: 'sightseeing', startTime: '', name: '', openTime: '', ticketPrice: '', note: '', transportMode: 'train', flightCode: '', duration: '', depAirport: '', depTime: '', arrAirport: '', arrTime: '' }; };
-                const saveItinerary = () => { const list = itineraryData.value[currentKey.value]; if(isEditing.value){const i=list.findIndex(x=>x.id===form.value.id);if(i!==-1)list[i]={...form.value};}else{form.value.id=Date.now();list.push({...form.value});} saveData(); showAddModal.value=false; };
+                const saveItinerary = () => {
+                    const list = itineraryData.value[currentKey.value];
+                    if(isEditing.value) { const i=list.findIndex(x=>x.id===form.value.id); if(i!==-1) list[i]={...form.value}; }
+                    else { form.value.id = Date.now(); list.push({...form.value}); }
+                    saveData(); showAddModal.value=false;
+                };
                 const editItem = (item) => { form.value={...item}; isEditing.value=true; showAddModal.value=true; };
-                const confirmDeleteItineraryItem = () => { const list=itineraryData.value[currentKey.value]; const i=list.findIndex(x=>x.id===form.value.id); if(i!==-1)list.splice(i,1); saveData(); }; // Parent modal closes in executeConfirm
+                const confirmDeleteItineraryItem = () => { const list=itineraryData.value[currentKey.value]; const i=list.findIndex(x=>x.id===form.value.id); if(i!==-1)list.splice(i,1); saveData(); }; 
 
-                const openInfoModal = (t, m, d=null) => { infoType.value=t; infoMode.value=m; infoForm.value=m==='edit'&&d?{...d}:{id:null}; showInfoModal.value=true; };
-                const saveInfoData = () => { if(infoType.value==='flight'){if(infoMode.value==='add')flights.value.push({...infoForm.value,id:Date.now()});else{const i=flights.value.findIndex(x=>x.id===infoForm.value.id);if(i!==-1)flights.value[i]={...infoForm.value};}}else{if(infoMode.value==='add')hotels.value.push({...infoForm.value,id:Date.now()});else{const i=hotels.value.findIndex(x=>x.id===infoForm.value.id);if(i!==-1)hotels.value[i]={...infoForm.value};}} saveData(); showInfoModal.value=false; };
-                const deleteInfoData = (t, id) => { if(t==='flight'){const i=flights.value.findIndex(x=>x.id===id);if(i!==-1)flights.value.splice(i,1);}else{const i=hotels.value.findIndex(x=>x.id===id);if(i!==-1)hotels.value.splice(i,1);} saveData(); };
+                // Modified openInfoModal to default title to '去程'
+                const openInfoModal = (t, m, d=null) => { 
+                    infoType.value=t; 
+                    infoMode.value=m; 
+                    if(m==='edit' && d) {
+                        infoForm.value = {...d};
+                    } else {
+                        infoForm.value = {id:null, title: '去程'}; // Default title
+                    }
+                    showInfoModal.value=true; 
+                };
+
+                const saveInfoData = () => {
+                    if(infoType.value==='flight') { if(infoMode.value==='add') flights.value.push({...infoForm.value, id:Date.now()}); else { const i=flights.value.findIndex(x=>x.id===infoForm.value.id); if(i!==-1) flights.value[i]={...infoForm.value}; } }
+                    else { if(infoMode.value==='add') hotels.value.push({...infoForm.value, id:Date.now()}); else { const i=hotels.value.findIndex(x=>x.id===infoForm.value.id); if(i!==-1) hotels.value[i]={...infoForm.value}; } }
+                    saveData(); showInfoModal.value=false;
+                };
+                const deleteInfoData = (t, id) => { if(t==='flight'){const i=flights.value.findIndex(x=>x.id===id);if(i!==-1)flights.value.splice(i,1);} else{const i=hotels.value.findIndex(x=>x.id===id);if(i!==-1)hotels.value.splice(i,1);} saveData(); };
 
                 const updateExchangeRate = async () => { try { const res = await fetch('https://open.er-api.com/v6/latest/HKD'); const data = await res.json(); if(data?.rates?.JPY) currency.value.rate = (1/data.rates.JPY).toFixed(4); } catch(e){} };
                 const convertCurrency = (t) => { if(t==='jpy') currency.value.hkd=(currency.value.jpy*currency.value.rate).toFixed(2); else currency.value.jpy=(currency.value.hkd/currency.value.rate).toFixed(0); };
@@ -428,24 +581,75 @@
                     };
                     reader.readAsDataURL(file);
                 };
-                const saveShopping = () => { if(!shoppingForm.value.name)return; shoppingList.value.push({...shoppingForm.value, id:Date.now(), checked:false}); shoppingForm.value={name:'',price:'',preview:null}; showShoppingModal.value=false; saveData(); };
-                const removeShoppingItem = (i) => { shoppingList.value.splice(i,1); saveData(); };
+
+                const saveShopping = () => { 
+                    if(!shoppingForm.value.name)return; 
+                    
+                    const newItem = {
+                        name: shoppingForm.value.name,
+                        price: shoppingForm.value.price,
+                        image: shoppingForm.value.preview,
+                        checked: false,
+                        createdAt: Date.now()
+                    };
+
+                    addDoc(collection(db, 'artifacts', currentAppId, 'public', 'data', 'travel_shopping'), newItem)
+                        .then(docRef => {
+                            // Add locally only after successful save to avoid duplication in snapshot
+                            // Actually snapshot handles addition, so no manual push needed here
+                        });
+                        
+                    shoppingForm.value={name:'',price:'',preview:null}; 
+                    showShoppingModal.value=false; 
+                };
+
+                const removeShoppingItem = (item) => {
+                    const idx = shoppingList.value.findIndex(i => i.id === item.id);
+                    if(idx !== -1) shoppingList.value.splice(idx, 1); // Optimistic delete
+                    deleteDoc(doc(db, 'artifacts', currentAppId, 'public', 'data', 'travel_shopping', item.id));
+                };
+
+                const toggleShoppingItem = (item) => {
+                    const newStatus = !item.checked;
+                    // Optimistic update not strictly needed as v-model does it, but syncing to DB
+                    setDoc(doc(db, 'artifacts', currentAppId, 'public', 'data', 'travel_shopping', item.id), { checked: newStatus }, { merge: true });
+                };
+
                 const openZoom = (img) => { 
-                    zoomedImage.value = img || 'https://via.placeholder.com/150?text=No+Image'; 
+                    zoomedImage.value = img || null; 
                     showImageZoom.value = true; 
                 };
                 
-                const updateChart = () => {
-                    if(!expenseChartCanvas.value) return;
-                    const cats = ['交通','飲食','住宿','門票','購物','其他'];
-                    const data = cats.map(c => expenses.value.filter(e => e.category===c).reduce((s,e)=>s+Number(e.amount),0));
-                    if(expenseChart) expenseChart.destroy();
-                    expenseChart = new Chart(expenseChartCanvas.value.getContext('2d'), { type:'doughnut', data: { labels: cats, datasets: [{ data, backgroundColor: ['#60A5FA','#FB923C','#818CF8','#4ADE80','#F472B6','#94A3B8'], borderWidth:0 }] }, options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } });
+                // --- Expense Functions ---
+                const openExpenseModal = (mode, data = null) => {
+                    if (mode === 'edit' && data) {
+                        expenseForm.value = { ...data };
+                    } else {
+                        expenseForm.value = { id: null, category: '飲食', name: '', amount: '', method: '現金', date: '' };
+                    }
+                    showExpenseModal.value = true;
                 };
-                const saveExpense = () => { if(!expenseForm.value.name)return; expenses.value.push({...expenseForm.value, id:Date.now(), date:currentKey.value}); expenseForm.value={id:null,category:'飲食',name:'',amount:'',method:'現金',date:''}; showExpenseModal.value=false; saveData(); nextTick(updateChart); };
-                const removeExpense = (id) => { const i=expenses.value.findIndex(e=>e.id===id); if(i!==-1)expenses.value.splice(i,1); saveData(); nextTick(updateChart); };
-                watch(currentTab, (v) => { if(v==='expenses') nextTick(updateChart); });
 
+                const saveExpense = () => { 
+                    if(!expenseForm.value.name) return; 
+                    
+                    if (expenseForm.value.id) {
+                        // Edit existing
+                        const index = expenses.value.findIndex(e => e.id === expenseForm.value.id);
+                        if (index !== -1) {
+                            expenses.value[index] = { ...expenseForm.value };
+                        }
+                    } else {
+                        // Add new
+                        expenses.value.push({...expenseForm.value, id:Date.now(), date:currentKey.value}); 
+                    }
+                    
+                    showExpenseModal.value=false; 
+                    saveData(); 
+                };
+
+                const removeExpense = (id) => { const i=expenses.value.findIndex(e=>e.id===id); if(i!==-1)expenses.value.splice(i,1); saveData(); };
+                
                 const fetchWeather = async () => {
                    const lat = 33.5904; const lon = 130.4017; const dateStr = currentKey.value;
                    try {
@@ -460,7 +664,7 @@
                     const data = {
                         tripDates: JSON.stringify(tripDates.value),
                         itinerary: JSON.stringify(itineraryData.value),
-                        shopping: JSON.stringify(shoppingList.value),
+                        // Shopping is separate
                         expenses: JSON.stringify(expenses.value),
                         flights: JSON.stringify(flights.value),
                         hotels: JSON.stringify(hotels.value)
@@ -476,19 +680,22 @@
                                 const d = snap.data();
                                 if (d.tripDates) tripDates.value = JSON.parse(d.tripDates);
                                 if (d.itinerary) Object.assign(itineraryData.value, JSON.parse(d.itinerary));
-                                if (d.shopping) shoppingList.value = JSON.parse(d.shopping);
                                 if (d.expenses) expenses.value = JSON.parse(d.expenses);
                                 if (d.flights) flights.value = JSON.parse(d.flights);
                                 if (d.hotels) hotels.value = JSON.parse(d.hotels);
                             } else { saveData(); }
                             loading.value = false;
                         });
-                    });
+
+                        onSnapshot(collection(db, 'artifacts', currentAppId, 'public', 'data', 'travel_shopping'), (snap) => {
+                            shoppingList.value = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        });
+                    }).catch(e => { console.error("Auth Error", e); loading.value=false; });
                     updateExchangeRate();
                     fetchWeather();
                 });
 
-                return { currentTab, tabs, tripDates, selectedDateIndex, weather, currency, currentDayItinerary, showAddModal, isEditing, form, saveItinerary, editItem, confirmDeleteItineraryItem, resetForm, dragStart, drop, addDay, deleteDay, openMap, calculateTravelTime, moveItem, shoppingList, showShoppingModal, shoppingForm, handleImageUpload, saveShopping, removeShoppingItem, expenses, showExpenseModal, expenseForm, saveExpense, removeExpense, totalExpenses, japaneseCategories, currentJpCat, filteredJapanese, speak, callNumber, convertCurrency, flights, hotels, showInfoModal, infoMode, infoType, infoForm, openInfoModal, saveInfoData, deleteInfoData, confirmState, triggerConfirm, executeConfirm, loading, zoomedImage, showImageZoom, openZoom, expenseChartCanvas, getCategoryName, getCategoryColor, getCategoryIcon, getTransportIcon, getExpenseIcon, getExpenseColor };
+                return { currentTab, tabs, tripDates, selectedDateIndex, weather, currency, currentDayItinerary, showAddModal, isEditing, form, saveItinerary, editItem, confirmDeleteItineraryItem, resetForm, dragStart, drop, addDay, deleteDay, openMap, calculateTravelTime, moveItem, shoppingList, showShoppingModal, shoppingForm, handleImageUpload, saveShopping, removeShoppingItem, toggleShoppingItem, expenses, showExpenseModal, expenseForm, openExpenseModal, saveExpense, removeExpense, totalExpenses, japaneseCategories, currentJpCat, filteredJapanese, speak, callNumber, convertCurrency, flights, hotels, showInfoModal, infoMode, infoType, infoForm, openInfoModal, saveInfoData, deleteInfoData, confirmState, triggerConfirm, executeConfirm, loading, zoomedImage, showImageZoom, openZoom, getCategoryName, getCategoryColor, getCategoryIcon, getTransportIcon, getExpenseIcon, getExpenseColor, pendingShoppingList, purchasedShoppingList };
             }
         }).mount('#app');
     </script>
