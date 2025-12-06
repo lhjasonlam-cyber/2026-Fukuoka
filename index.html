@@ -15,7 +15,6 @@
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet"> <!-- Sign board font -->
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,29 +23,20 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { 
-                        sans: ['Noto Sans TC', 'sans-serif'],
-                        rounded: ['Kosugi Maru', 'sans-serif']
-                    },
+                    fontFamily: { sans: ['Noto Sans TC', 'sans-serif'] },
                     colors: {
                         navy: { 50: '#f0f4f8', 100: '#d9e2ec', 500: '#334e68', 800: '#102a43', 900: '#0b1d30' },
-                        ice: { 100: '#e3f8ff', 200: '#bdebf9', 500: '#40c3f7' },
-                        wood: { 800: '#5D4037', 900: '#3E2723' }
+                        ice: { 100: '#e3f8ff', 200: '#bdebf9', 500: '#40c3f7' }
                     },
                     animation: {
                         'pop-in': 'pop-in 0.2s ease-out forwards',
                         'slide-up': 'slide-up 0.3s ease-out forwards',
                         'fade-in': 'fade-in 0.3s ease-out forwards',
-                        'sway': 'sway 3s ease-in-out infinite', // 微幅擺動動畫
                     },
                     keyframes: {
                         'pop-in': { '0%': { transform: 'scale(0.9)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } },
                         'slide-up': { '0%': { transform: 'translateY(100%)' }, '100%': { transform: 'translateY(0)' } },
-                        'fade-in': { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                        'sway': {
-                            '0%, 100%': { transform: 'rotate(-1deg)' },
-                            '50%': { transform: 'rotate(1deg)' }
-                        }
+                        'fade-in': { '0%': { opacity: '0' }, '100%': { opacity: '1' } }
                     }
                 }
             }
@@ -66,7 +56,6 @@
         .glass { background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: #000; }
         .bg-light-navy { background-color: #eef2f6; border-color: #dbe4ee; }
         .banner-gradient { background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%); }
-        .wood-text-shadow { text-shadow: 1px 1px 0px rgba(255,255,255,0.4), -1px -1px 0px rgba(0,0,0,0.3); }
         body { background-color: #ffffff; -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
@@ -79,18 +68,11 @@
             <div class="absolute top-0 left-0 w-full h-full bg-cover bg-center" style="background-image: url('banner.webp'); background-color: #102a43;"></div>
             <div class="absolute top-0 left-0 w-full h-full banner-gradient"></div>
             
-            <!-- [MODIFIED] Wooden Sign Board Image -->
-            <!-- 使用圖片取代 SVG，請確保將去背後的圖片命名為 signboard.png 並上傳 -->
-            <div class="absolute top-0 right-[2%] z-20 w-64 h-auto flex justify-center origin-top">
-                <div class="relative w-full">
-                    <!-- 圖片 -->
-                    <img src="signboard.webp" alt="Sign Board" class="w-full h-auto drop-shadow-xl filter brightness-105">
-                    
-                    <!-- 疊加文字 -->
-                    <!-- 透過 top/left/transform 將文字定位在木板中央 -->
-                    <h1 class="absolute top-[50%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3x1 font-bold tracking-[0.1em] text-[#3E2723] font-rounded wood-text-shadow whitespace-nowrap rotate-0">
-                        2026・福岡
-                    </h1>
+            <!-- [REVERTED] Title back to Glassmorphism style at original position -->
+            <!-- Removed wooden sign, restored to top-6 right-6 with bg-white/20 -->
+            <div class="absolute top-6 right-6 z-20">
+                <div class="backdrop-blur-md bg-white/20 border border-white/20 rounded-2xl px-5 py-3 shadow-xl">
+                    <h1 class="text-xl font-bold tracking-[0.2em] text-white drop-shadow-md">2026・福岡</h1>
                 </div>
             </div>
 
@@ -1026,5 +1008,4 @@
         }).mount('#app');
     </script>
 </body>
-
 </html>
