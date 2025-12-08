@@ -246,7 +246,7 @@
                         <button @click="scrollToMenu(); showPackingModal = true; packingForm = { name: '', category: '證件錢包', gender: null, quantity: 1 }" class="fixed bottom-28 right-6 w-14 h-14 bg-ice-500 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform z-40 border-2 border-white"><i class="fas fa-plus"></i></button>
                     </div>
 
-                    <!-- 3. 資訊 -->
+                    <!-- 3. 資訊 (Info) - Restored -->
                     <div v-if="currentTab === 'info'" class="space-y-6 animate-fade-in">
                         <section class="bg-gradient-to-br from-[#f0f4f8] to-[#d9e2ec] rounded-2xl p-5 shadow-sm border border-navy-100">
                             <h3 class="text-black font-bold mb-4 flex items-center justify-between"><span class="flex items-center"><i class="fas fa-coins mr-2 text-yellow-500"></i> 匯率換算</span><span class="text-[10px] bg-green-100 text-green-600 px-2 py-1 rounded-full">即時匯率</span></h3>
@@ -774,7 +774,8 @@
 
                 const openShoppingModal = (mode, item=null) => {
                     if (mode === 'edit' && item) {
-                        shoppingForm.value = { ...item };
+                        // FIX: When editing, populate preview with existing image URL
+                        shoppingForm.value = { ...item, preview: item.image };
                     } else {
                         shoppingForm.value = { id: null, name: '', price: '', location: '', preview: null };
                     }
@@ -788,7 +789,7 @@
                         name: shoppingForm.value.name,
                         price: shoppingForm.value.price,
                         location: shoppingForm.value.location,
-                        image: shoppingForm.value.preview,
+                        image: shoppingForm.value.preview || null, // Default to null to prevent undefined
                         checked: shoppingForm.value.checked || false,
                         createdAt: shoppingForm.value.createdAt || Date.now()
                     };
