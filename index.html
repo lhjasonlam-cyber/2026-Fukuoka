@@ -300,15 +300,18 @@
                         <div v-if="pendingShoppingList.length > 0" class="mb-8">
                             <h3 class="text-navy-900 font-bold mb-3 flex items-center text-lg"><i class="fas fa-hourglass-half mr-2 text-orange-400"></i> 等待購買 ({{ pendingShoppingList.length }})</h3>
                             <div class="grid grid-cols-2 gap-4">
-                                <div v-for="(item) in pendingShoppingList" :key="item.id" class="glass rounded-2xl overflow-hidden shadow-sm relative group cursor-pointer" @click="openZoom(item.image)">
+                                <!-- [MODIFIED] Moved @click="openZoom" to image container only -->
+                                <div v-for="(item) in pendingShoppingList" :key="item.id" class="glass rounded-2xl overflow-hidden shadow-sm relative group">
                                     <button @click.stop="openShoppingModal('edit', item)" class="absolute bottom-2 right-2 bg-white/90 text-navy-600 rounded-full w-8 h-8 flex items-center justify-center text-sm shadow-md hover:bg-white z-20"><i class="fas fa-pen"></i></button>
                                     <button @click.stop="triggerConfirm('確定移除此購物項目？', () => removeShoppingItem(item))" class="absolute top-2 right-2 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-black/70 z-10"><i class="fas fa-times"></i></button>
-                                    <div class="h-32 w-full bg-gray-200 overflow-hidden flex items-center justify-center relative">
+                                    
+                                    <!-- Image Container - Click to Zoom -->
+                                    <div class="h-32 w-full bg-gray-200 overflow-hidden flex items-center justify-center relative cursor-pointer" @click="openZoom(item.image)">
                                         <img v-if="item.image" :src="item.image" class="w-full h-full object-cover absolute inset-0">
                                         <div v-else class="text-gray-400 text-xs flex flex-col items-center"><i class="fas fa-image text-2xl mb-1"></i>No Image</div>
                                     </div>
+                                    
                                     <div class="p-3">
-                                        <!-- [MODIFIED] Price moved to top right, aligned with Name -->
                                         <div class="flex justify-between items-start mb-1">
                                             <h4 class="font-bold text-sm truncate text-black flex-1 mr-2">{{ item.name }}</h4>
                                             <div v-if="item.price" class="text-sm font-bold text-navy-800 whitespace-nowrap">¥ {{ Number(item.price).toLocaleString() }}</div>
@@ -331,15 +334,18 @@
                         <div v-if="purchasedShoppingList.length > 0" class="mb-8 opacity-70">
                             <h3 class="text-navy-900 font-bold mb-3 flex items-center text-lg"><i class="fas fa-check-circle mr-2 text-green-500"></i> 已購買 ({{ purchasedShoppingList.length }})</h3>
                             <div class="grid grid-cols-2 gap-4">
-                                <div v-for="(item) in purchasedShoppingList" :key="item.id" class="glass rounded-2xl overflow-hidden shadow-sm relative group cursor-pointer grayscale" @click="openZoom(item.image)">
+                                <!-- [MODIFIED] Moved @click="openZoom" to image container only -->
+                                <div v-for="(item) in purchasedShoppingList" :key="item.id" class="glass rounded-2xl overflow-hidden shadow-sm relative group grayscale">
                                     <button @click.stop="openShoppingModal('edit', item)" class="absolute bottom-2 right-2 bg-white/90 text-navy-600 rounded-full w-8 h-8 flex items-center justify-center text-sm shadow-md hover:bg-white z-20"><i class="fas fa-pen"></i></button>
                                     <button @click.stop="triggerConfirm('確定移除此購物項目？', () => removeShoppingItem(item))" class="absolute top-2 right-2 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-black/70 z-10"><i class="fas fa-times"></i></button>
-                                    <div class="h-32 w-full bg-gray-200 overflow-hidden flex items-center justify-center relative">
+                                    
+                                    <!-- Image Container - Click to Zoom -->
+                                    <div class="h-32 w-full bg-gray-200 overflow-hidden flex items-center justify-center relative cursor-pointer" @click="openZoom(item.image)">
                                         <img v-if="item.image" :src="item.image" class="w-full h-full object-cover absolute inset-0">
                                         <div v-else class="text-gray-400 text-xs flex flex-col items-center"><i class="fas fa-image text-2xl mb-1"></i>No Image</div>
                                     </div>
+                                    
                                     <div class="p-3">
-                                        <!-- [MODIFIED] Price moved to top right, aligned with Name for purchased items -->
                                         <div class="flex justify-between items-start mb-1">
                                             <h4 class="font-bold text-sm truncate text-black flex-1 mr-2 line-through text-gray-400">{{ item.name }}</h4>
                                             <div v-if="item.price" class="text-sm font-bold text-navy-800 whitespace-nowrap line-through text-gray-400">¥ {{ Number(item.price).toLocaleString() }}</div>
